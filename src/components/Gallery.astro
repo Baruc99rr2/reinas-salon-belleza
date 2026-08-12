@@ -1,0 +1,174 @@
+---
+import bgGalleryImg from "../assets/carrousel/bg-carrousel.png";
+import logoCrest from "../assets/logo2.png";
+import galleryVideo from "../assets/carrousel/carrousel-9.mp4";
+import img1 from "../assets/carrousel/carrousel-1.jpg";
+import img2 from "../assets/carrousel/carrousel-2.jpg";
+import img3 from "../assets/carrousel/carrousel-3.jpg";
+import img4 from "../assets/carrousel/carrousel-4.jpg";
+import img5 from "../assets/carrousel/carrousel-5.jpg";
+import img6 from "../assets/carrousel/carrousel-6.jpg";
+import img7 from "../assets/carrousel/carrousel-7.jpg";
+import img8 from "../assets/carrousel/carrousel-8.jpg";
+
+// El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda
+// central (columna 2, fila 2) es el video; las 8 fotos se reparten en el resto en orden.
+const columns = [
+  [img1, img4, img6],
+  [img2, null, img7],
+  [img3, img5, img8],
+];
+
+const imageClass =
+  "absolute inset-0 h-full w-full object-cover saturate-75 brightness-95 transition-all duration-500 " +
+  "group-hover:saturate-100 group-hover:brightness-105 group-[&.is-active]:saturate-100 group-[&.is-active]:brightness-105 " +
+  "dark:brightness-90 dark:group-hover:brightness-100 dark:group-[&.is-active]:brightness-100";
+---
+
+<section id="gallery" class="relative bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
+  {/* Mismo criterio que MySkills: filtro oscuro sutil en claro y más marcado en oscuro, para
+     que el grid y el texto tengan buen contraste sobre la foto de fondo en ambos temas. */}
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 z-0 min-h-full dark:opacity-20"
+    style={`background-image: url(${bgGalleryImg.src}); background-size: cover; background-position: center; background-repeat: no-repeat;`}
+  />
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 min-h-full bg-warmgray-900/45 dark:bg-warmgray-900/75" />
+
+  <div class="relative z-10 mx-auto max-w-6xl">
+    {/* Texto blanco fijo (no dark:) con sombra sutil: va sobre una foto de fondo, igual que en
+       MySkills. */}
+    <div class="mb-12 text-center [text-shadow:0_1px_4px_rgba(0,0,0,0.4)] md:mb-16">
+      <p class="font-sans text-xs font-semibold tracking-widest text-white uppercase">Galería</p>
+      <h2 class="mt-2 font-display text-3xl text-white md:text-5xl">Nuestro trabajo en imágenes</h2>
+      <p class="mx-auto mt-3 max-w-xl font-sans font-medium text-white">
+        Un vistazo a los detalles, el ambiente y los resultados que nos representan. Pasá el cursor —o tocá, en mobile— sobre cada
+        imagen para agrandarla.
+      </p>
+    </div>
+
+    {/* Contenedor cuadrado: 90vw en mobile (no vmin, para no encogerse demasiado en pantallas
+       bajas) y 70vmin desde sm, con un tope razonable (max-w-4xl) en pantallas grandes.
+       [container-type:inline-size] habilita las unidades cqmin que usan las celdas para
+       repartirse el espacio, en vez de un clip-path/tamaño fijo en píxeles. */}
+    <div class="relative mx-auto h-[90vw] w-[90vw] [container-type:inline-size] sm:h-[70vmin] sm:w-[70vmin] sm:max-h-[56rem] sm:max-w-4xl">
+      <div data-gallery-grid class="relative h-full w-full">
+        {
+          columns.map((column, colIndex) => (
+            <div data-col>
+              {column.map((cell, rowIndex) => {
+                const position = colIndex + rowIndex * 3 + 1;
+                return (
+                  <article
+                    data-cell
+                    tabindex="0"
+                    role="button"
+                    aria-label={cell ? `Ver imagen ${position} de la galería en grande` : "Video de Estética Reina"}
+                    class="group relative cursor-pointer overflow-hidden rounded-xl bg-warmgray-800 outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                  >
+                    {cell ? (
+                      <img src={cell.src} alt="" class={imageClass} />
+                    ) : (
+                      <>
+                        <video class={imageClass} src={galleryVideo} autoplay loop muted playsinline preload="auto" aria-hidden="true" />
+                        <div class="absolute inset-0 flex items-center justify-center bg-warmgray-900/20">
+                          <img src={logoCrest.src} alt="" aria-hidden="true" class="h-1/3 w-1/3 object-contain opacity-80 drop-shadow-lg" />
+                        </div>
+                      </>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Técnica "bento hover": el grid externo tiene 3 columnas (una por [data-col]) y cada
+     columna es a su vez un grid de 3 filas (una por [data-cell]). Al pasar el cursor —o tocar,
+     ver el script más abajo— sobre una celda, :has() agranda la COLUMNA que la contiene
+     (grid-template-columns, en el grid externo) y, dentro de esa columna, agranda su FILA
+     (grid-template-rows, en el [data-col]). Las columnas cqmin/cqmax se calculan contra el
+     contenedor cuadrado de arriba gracias a [container-type:inline-size], así que la proporción
+     60/15/15 escala solo con el tamaño real del grid, sin depender del viewport completo. Sin
+     el prefijo `md:` del ejemplo original: el mismo grid (sin apilarse) y la misma expansión
+     valen en cualquier tamaño de pantalla, para que el toque en mobile se comporte igual que el
+     hover en desktop. */
+  [data-gallery-grid] {
+    display: grid;
+    grid-template-columns: 30cqmin 30cqmin 30cqmin;
+    gap: 0.5rem;
+    transition: grid-template-columns 500ms ease-in-out;
+  }
+
+  [data-gallery-grid]:has(> [data-col]:nth-child(1):is(:hover, .is-active)) {
+    grid-template-columns: 60cqmin 15cqmin 15cqmin;
+  }
+  [data-gallery-grid]:has(> [data-col]:nth-child(2):is(:hover, .is-active)) {
+    grid-template-columns: 15cqmin 60cqmin 15cqmin;
+  }
+  [data-gallery-grid]:has(> [data-col]:nth-child(3):is(:hover, .is-active)) {
+    grid-template-columns: 15cqmin 15cqmin 60cqmin;
+  }
+
+  [data-col] {
+    display: grid;
+    grid-template-rows: 30cqmin 30cqmin 30cqmin;
+    gap: 0.5rem;
+    transition: grid-template-rows 500ms ease-in-out;
+  }
+
+  [data-col]:has(> [data-cell]:nth-child(1):is(:hover, .is-active)) {
+    grid-template-rows: 60cqmin 15cqmin 15cqmin;
+  }
+  [data-col]:has(> [data-cell]:nth-child(2):is(:hover, .is-active)) {
+    grid-template-rows: 15cqmin 60cqmin 15cqmin;
+  }
+  [data-col]:has(> [data-cell]:nth-child(3):is(:hover, .is-active)) {
+    grid-template-rows: 15cqmin 15cqmin 60cqmin;
+  }
+
+  @media (min-width: 640px) {
+    [data-gallery-grid],
+    [data-col] {
+      gap: 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Mismo efecto que :hover en desktop, pero disparado por click/tap: agrega .is-active a la
+  // celda tocada (para su regla de grid-rows) y a la columna que la contiene (para la de
+  // grid-columns) — así el toque en mobile expande igual que el mouse en desktop, sin duplicar
+  // las reglas CSS de arriba. Tocar la misma celda otra vez vuelve al grid parejo.
+  const cells = Array.from(document.querySelectorAll<HTMLElement>("[data-cell]"));
+  const columns = Array.from(document.querySelectorAll<HTMLElement>("[data-col]"));
+
+  function clearActive() {
+    cells.forEach((cell) => cell.classList.remove("is-active"));
+    columns.forEach((column) => column.classList.remove("is-active"));
+  }
+
+  function toggleActive(cell: HTMLElement) {
+    const wasActive = cell.classList.contains("is-active");
+    clearActive();
+    if (!wasActive) {
+      cell.classList.add("is-active");
+      cell.parentElement?.classList.add("is-active");
+    }
+  }
+
+  cells.forEach((cell) => {
+    cell.addEventListener("click", () => toggleActive(cell));
+    cell.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleActive(cell);
+      }
+    });
+  });
+</script>

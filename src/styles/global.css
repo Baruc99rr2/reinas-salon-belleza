@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+/* Modo oscuro basado en la clase .dark (en <html>), no en prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Paleta rosada — de muy claro (fondos) a medio (acentos/botones) */
+  --color-rose-50: #fff5f8;
+  --color-rose-100: #fde8ef;
+  --color-rose-200: #fbd3e0;
+  --color-rose-300: #f7b2cb;
+  --color-rose-400: #f28fb2;
+  --color-rose-500: #e8709a;
+  --color-rose-600: #d14d7c;
+  --color-rose-700: #b23662;
+
+  /* Gris cálido: para textos secundarios en claro y textos claros en oscuro */
+  --color-warmgray-100: #efe8e5;
+  --color-warmgray-400: #a69b95;
+  --color-warmgray-600: #7d716c;
+  --color-warmgray-700: #5c5049;
+  --color-warmgray-800: #4a413d;
+
+  /* Fondo cálido oscuro (no negro puro) para el modo oscuro */
+  --color-warmgray-900: #2b2422;
+
+  /* Rosado apagado/desaturado para acentos en modo oscuro (evita que rose-500/600
+     "brillen" demasiado sobre fondos oscuros, manteniendo la identidad de marca) */
+  --color-rose-muted: #c98ba0;
+  --color-rose-muted-strong: #a9697f;
+
+  /* Tipografías */
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Poppins", sans-serif;
+}
+
+/* Scroll suave al navegar por anclas (links del Navbar). scroll-margin-top evita que el
+   Navbar fixed tape el borde superior de la sección de destino al llegar. */
+html {
+  scroll-behavior: smooth;
+}
+
+main section[id],
+footer[id] {
+  scroll-margin-top: 6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+ * Transición claro/oscuro: una barra fina recorre la pantalla de izquierda a
+ * derecha revelando el nuevo tema por encima del anterior (View Transitions API,
+ * disparada desde Navbar.astro). ::view-transition-old(root) es una foto fija del
+ * estado previo y se mantiene visible sin animar; ::view-transition-new(root) es
+ * el estado nuevo en vivo, que se va revelando con clip-path. Como ambas capas
+ * están presentes todo el tiempo, nada desaparece ni parpadea durante el cambio.
+ */
+::view-transition-group(root) {
+  animation-duration: 700ms;
+}
+
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-sweep-reveal 700ms ease-in-out forwards;
+  mix-blend-mode: normal;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 10px rgba(232, 112, 154, 0.65));
+}
+
+@keyframes theme-sweep-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,478 @@
+---
+import { pricingPlans } from "../data/pricing";
+---
+
+<section id="pricing" class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
+  {/* Fondo de la sección: la imagen del plan activo, en dos capas <img> superpuestas para el
+     cross-fade (ver script + .pricing-bg-layer más abajo) — nunca se corta de golpe, siempre
+     hay una entrando en opacity mientras la otra sale. Mismo overlay que en MySkills/Gallery
+     para que el texto siga siendo legible encima en los dos temas. */}
+  <div class="absolute inset-0 z-0" aria-hidden="true">
+    <img data-pricing-bg src={pricingPlans[0].bgImage?.src} alt="" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-100" />
+    <img data-pricing-bg src={pricingPlans[0].bgImage?.src} alt="" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-0" />
+  </div>
+  <div class="absolute inset-0 z-0 bg-warmgray-900/45 dark:bg-warmgray-900/75" aria-hidden="true" />
+
+  <div class="relative z-10 mx-auto max-w-6xl">
+    <div class="mb-12 text-center md:mb-16">
+      <p class="font-sans text-xs font-semibold tracking-widest text-rose-500 uppercase dark:text-rose-muted">Precios</p>
+      <h2 class="mt-2 font-display text-3xl text-warmgray-800 md:text-5xl dark:text-warmgray-100">Nuestros planes</h2>
+      <p class="mx-auto mt-3 max-w-xl font-sans text-warmgray-600 dark:text-warmgray-400">
+        Elegí el servicio que mejor se adapte a tu momento. Precios de referencia, consultanos por combinaciones a medida.
+      </p>
+    </div>
+
+    {/* touch-action:pan-y — el swipe horizontal lo maneja el script (touchstart/touchend, ver
+       abajo), pan-y deja el scroll vertical de la página intacto y evita que el navegador
+       interprete el gesto como algo ambiguo (el mismo tipo de problema que ya causó overflow
+       horizontal en otra sección de esta página). */}
+    <div class="relative overflow-x-hidden [touch-action:pan-y]" data-carousel>
+      <div class="relative h-[540px] overflow-hidden sm:h-[500px] md:[perspective:1400px]" data-stage>
+        <div class="absolute inset-0 md:[transform-style:preserve-3d]" data-track>
+          {
+            pricingPlans.map((plan, i) => (
+              <article
+                data-card
+                data-index={i}
+                class:list={[
+                  "pricing-card absolute top-1/2 left-1/2 flex w-[min(72vw,20rem)] flex-col rounded-2xl border bg-white p-4 text-left shadow-lg sm:w-[min(80vw,20rem)] sm:p-6 dark:bg-warmgray-800",
+                  plan.featured
+                    ? "border-rose-300 ring-2 ring-rose-200 dark:border-rose-muted dark:ring-rose-muted/25"
+                    : "border-rose-100 dark:border-warmgray-700",
+                ]}
+              >
+                {plan.featured && (
+                  <span class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white shadow">
+                    Más elegido
+                  </span>
+                )}
+
+                <canvas
+                  data-shape-canvas
+                  data-flower-color={plan.flowerColor ?? "#c98ba0"}
+                  width="160"
+                  height="160"
+                  class="pointer-events-none absolute top-1.5 right-1.5 z-0 h-14 w-14 opacity-60 sm:top-2 sm:right-2 sm:h-20 sm:w-20"
+                  aria-hidden="true"
+                />
+
+                <div class="relative z-10 flex flex-1 flex-col">
+                  <p class="font-sans text-xs font-semibold tracking-wide text-rose-500 uppercase dark:text-rose-muted">
+                    {plan.category}
+                  </p>
+                  <h3 class="mt-1 font-display text-[clamp(1.125rem,5.5vw,1.5rem)] text-warmgray-800 dark:text-warmgray-100">
+                    {plan.title}
+                  </h3>
+
+                  <p class="mt-4 flex items-baseline gap-1">
+                    <span class="font-display text-[clamp(1.375rem,7vw,1.875rem)] text-rose-600 dark:text-rose-muted">
+                      {plan.price === "A consultar" ? plan.price : `$${plan.price}`}
+                    </span>
+                    {plan.period && <span class="font-sans text-sm text-warmgray-600 dark:text-warmgray-400">{plan.period}</span>}
+                  </p>
+
+                  <ul class="mt-5 flex-1 space-y-2 font-sans text-sm text-warmgray-600 dark:text-warmgray-400">
+                    {plan.description.map((item) => (
+                      <li class="flex items-start gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          class="mt-0.5 h-4 w-4 shrink-0 text-rose-400 dark:text-rose-muted"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    class="mt-6 w-full rounded-full bg-rose-500 px-4 py-2.5 font-sans text-sm font-semibold text-white transition-colors hover:bg-rose-600 dark:hover:bg-rose-muted-strong"
+                  >
+                    Consultar
+                  </button>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <button
+        type="button"
+        data-prev
+        aria-label="Plan anterior"
+        class="absolute top-1/2 left-0 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-500 shadow-md transition-colors hover:bg-rose-50 sm:left-2 sm:h-10 sm:w-10 md:left-0 dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-rose-muted dark:hover:bg-warmgray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 sm:h-5 sm:w-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        data-next
+        aria-label="Plan siguiente"
+        class="absolute top-1/2 right-0 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-500 shadow-md transition-colors hover:bg-rose-50 sm:right-2 sm:h-10 sm:w-10 md:right-0 dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-rose-muted dark:hover:bg-warmgray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 sm:h-5 sm:w-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      <div class="mt-6 flex justify-center gap-2" data-dots>
+        {
+          pricingPlans.map((_, i) => (
+            <button
+              type="button"
+              data-dot={i}
+              aria-label={`Ir al plan ${i + 1}`}
+              class="h-2 w-2 rounded-full bg-rose-200 transition-all duration-300 dark:bg-warmgray-700"
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Duración pensada para calzar con .pricing-card (1000ms) sin quedar más lenta que el resto
+     del carrusel; BG_TRANSITION_MS en el script usa el mismo valor para el "lock" de navegación. */
+  .pricing-bg-layer {
+    transition: opacity 900ms ease-in-out;
+    will-change: opacity;
+  }
+
+  .pricing-card {
+    --offset: 0;
+    --dist: 0;
+    transform: translate(-50%, -50%) translateX(calc(var(--offset) * 190px)) scale(calc(1 - var(--dist) * 0.12));
+    opacity: calc(1 - var(--dist) * 0.35);
+    z-index: calc(10 - var(--dist));
+    transition:
+      transform 1000ms ease-in-out,
+      opacity 1000ms ease-in-out;
+    will-change: transform, opacity;
+  }
+
+  @media (min-width: 768px) {
+    .pricing-card {
+      transform: translate(-50%, -50%) translateX(calc(var(--offset) * 230px)) translateZ(calc(var(--dist) * -160px)) rotateY(
+            calc(var(--offset) * -30deg)
+          ) scale(calc(1 - var(--dist) * 0.1));
+    }
+  }
+
+  [data-dot].is-active {
+    background-color: var(--color-rose-500, #e8709a);
+    width: 1.5rem;
+    border-radius: 9999px;
+  }
+
+  :global(.dark) [data-dot].is-active {
+    background-color: var(--color-rose-muted, #c98ba0);
+  }
+</style>
+
+<script>
+  import { pricingPlans } from "../data/pricing";
+
+  const stage = document.querySelector<HTMLElement>("[data-carousel]");
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-card]"));
+  const dots = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-dot]"));
+  const prevBtn = document.querySelector<HTMLButtonElement>("[data-prev]");
+  const nextBtn = document.querySelector<HTMLButtonElement>("[data-next]");
+  const bgLayers = Array.from(document.querySelectorAll<HTMLImageElement>("[data-pricing-bg]"));
+  const total = cards.length;
+
+  const AUTOPLAY_MS = 4500;
+  const SWIPE_THRESHOLD = 50;
+  // Debe coincidir con la transition-duration de .pricing-bg-layer en el <style> de arriba:
+  // es cuánto tarda el cross-fade del fondo, y también cuánto dura el "lock" de navegación
+  // (ver isTransitioning) para que nunca se pueda arrancar un segundo cambio de plan a mitad
+  // del fundido anterior — ni haciendo swipe varias veces seguidas muy rápido.
+  const BG_TRANSITION_MS = 900;
+
+  let activeIndex = 0;
+  let autoplayTimer: ReturnType<typeof setInterval> | undefined;
+  let isTransitioning = false;
+
+  // Dos capas <img> superpuestas, alternando cuál está "arriba" (opacity 1): la de atrás
+  // recibe el src del plan nuevo y sube a opacity 1 mientras la de adelante baja a 0, al mismo
+  // tiempo — ese solapamiento es lo que se ve como cross-fade en vez de un corte.
+  let frontBgIndex = 0;
+
+  function setBackground(index: number) {
+    const bgImage = pricingPlans[index]?.bgImage;
+    if (!bgImage || bgLayers.length < 2) return;
+
+    const backIndex = frontBgIndex === 0 ? 1 : 0;
+    const frontLayer = bgLayers[frontBgIndex];
+    const backLayer = bgLayers[backIndex];
+
+    backLayer.src = bgImage.src;
+    backLayer.style.opacity = "1";
+    frontLayer.style.opacity = "0";
+    frontBgIndex = backIndex;
+  }
+
+  function render() {
+    cards.forEach((card, i) => {
+      let offset = i - activeIndex;
+      if (offset > total / 2) offset -= total;
+      if (offset < -total / 2) offset += total;
+
+      const dist = Math.min(Math.abs(offset), 3);
+      card.style.setProperty("--offset", String(offset));
+      card.style.setProperty("--dist", String(dist));
+
+      const isActive = offset === 0;
+      card.style.pointerEvents = isActive ? "auto" : "none";
+      card.setAttribute("aria-hidden", isActive ? "false" : "true");
+    });
+
+    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === activeIndex));
+  }
+
+  // Todas las formas de navegar (flechas, dots, swipe, autoplay) pasan por acá: mientras
+  // isTransitioning esté activo, un plan nuevo simplemente no se acepta — así, aunque el
+  // usuario deslice el dedo varias veces seguidas muy rápido, el carrusel avanza de un plan
+  // por vez en vez de saltar varios o descontrolarse.
+  function goTo(index: number) {
+    if (isTransitioning) return;
+
+    const nextIndex = ((index % total) + total) % total;
+    if (nextIndex === activeIndex) return;
+
+    isTransitioning = true;
+    activeIndex = nextIndex;
+    render();
+    setBackground(activeIndex);
+
+    setTimeout(() => {
+      isTransitioning = false;
+    }, BG_TRANSITION_MS);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(() => {
+      if (!document.hidden) goTo(activeIndex + 1);
+    }, AUTOPLAY_MS);
+  }
+
+  function manualGoTo(index: number) {
+    goTo(index);
+    startAutoplay();
+  }
+
+  prevBtn?.addEventListener("click", () => manualGoTo(activeIndex - 1));
+  nextBtn?.addEventListener("click", () => manualGoTo(activeIndex + 1));
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => manualGoTo(i));
+  });
+
+  // --- Swipe táctil (mobile): touchstart/touchend + touch-action:pan-y en [data-carousel]
+  // (ver la clase en el markup) para que el gesto horizontal no interfiera con el scroll
+  // vertical normal de la página ni reabra el overflow horizontal ya resuelto antes. ---
+  let touchStartX = 0;
+
+  stage?.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartX = event.touches[0]?.clientX ?? 0;
+    },
+    { passive: true },
+  );
+
+  stage?.addEventListener(
+    "touchend",
+    (event) => {
+      const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX;
+      const deltaX = touchEndX - touchStartX;
+      if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
+      manualGoTo(deltaX < 0 ? activeIndex + 1 : activeIndex - 1);
+    },
+    { passive: true },
+  );
+
+  render();
+  startAutoplay();
+</script>
+
+<script>
+  // --- Formas 3D decorativas por card (Three.js) ---
+  // En desktop rotan solas en loop; en mobile se renderiza un único frame estático
+  // y jamás se arranca el loop de rAF, para no gastar recursos en gama baja.
+  //
+  // Estas formas dependen de medir el tamaño real (en píxeles) del canvas, que solo
+  // es confiable una vez que el layout terminó de aplicarse. Si se mide antes (por
+  // ejemplo en un hard reload donde el JS puede ejecutar antes de que el CSS termine
+  // de pintar), clientWidth puede devolver 0. Por eso: (1) esperamos el evento
+  // `load` en vez de inicializar apenas el módulo se evalúa, (2) si aun así el
+  // ancho medido es 0, reintentamos en el próximo frame en vez de inicializar con
+  // un tamaño inválido, y (3) cada card se inicializa en su propio try/catch para
+  // que un fallo (WebGL no disponible, contexto perdido, etc.) en una card no
+  // interrumpa la inicialización de las demás ni del resto de la página.
+  import * as THREE from "three";
+
+  const DEFAULT_FLOWER_COLOR = "#c98ba0";
+  const FLOWER_CENTER_COLOR = 0xf4d35e;
+  const PETAL_COUNT = 6;
+  const MAX_SIZE_RETRIES = 30;
+  const desktopQuery = window.matchMedia("(min-width: 768px)");
+
+  // Contorno de un pétalo dibujado con curvas bézier: arranca y termina en el
+  // centro (0,0), se abre hacia los costados y cierra en punta arriba.
+  function createPetalGeometry(): THREE.ExtrudeGeometry {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.bezierCurveTo(0.32, 0.18, 0.3, 0.68, 0, 0.95);
+    shape.bezierCurveTo(-0.3, 0.68, -0.32, 0.18, 0, 0);
+
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.08,
+      bevelEnabled: true,
+      bevelThickness: 0.025,
+      bevelSize: 0.025,
+      bevelSegments: 1,
+      curveSegments: 5,
+    });
+    geometry.translate(0, 0, -0.04);
+    return geometry;
+  }
+
+  // Flor low-poly: un pétalo repetido y rotado alrededor del eje central, más
+  // una esfera aplanada al centro en un tono distinto (el "corazón" de la flor).
+  function createFlower(petalColorHex: string): THREE.Group {
+    const flower = new THREE.Group();
+
+    const petalGeometry = createPetalGeometry();
+    const petalMaterial = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(petalColorHex),
+      roughness: 0.45,
+      metalness: 0.05,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    });
+
+    for (let i = 0; i < PETAL_COUNT; i++) {
+      const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+      petal.rotation.z = (i / PETAL_COUNT) * Math.PI * 2;
+      flower.add(petal);
+    }
+
+    const centerGeometry = new THREE.SphereGeometry(0.26, 8, 6);
+    centerGeometry.scale(1, 1, 0.55);
+    const centerMaterial = new THREE.MeshStandardMaterial({
+      color: FLOWER_CENTER_COLOR,
+      roughness: 0.4,
+      metalness: 0.1,
+      flatShading: true,
+    });
+    const center = new THREE.Mesh(centerGeometry, centerMaterial);
+    center.position.z = 0.05;
+    flower.add(center);
+
+    return flower;
+  }
+
+  function initShape(canvas: HTMLCanvasElement, index: number, size: number) {
+    const petalColorHex = canvas.dataset.flowerColor || DEFAULT_FLOWER_COLOR;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(size, size, false);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10);
+    camera.position.set(0, 0, 3.2);
+
+    const flower = createFlower(petalColorHex);
+    flower.rotation.set(0.4, index * 0.6, 0.1);
+    scene.add(flower);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    keyLight.position.set(2, 2, 3);
+    scene.add(keyLight);
+
+    let rafId: number | undefined;
+
+    function renderFrame() {
+      renderer.render(scene, camera);
+    }
+
+    function animate() {
+      flower.rotation.x += 0.004;
+      flower.rotation.y += 0.006;
+      renderFrame();
+      rafId = requestAnimationFrame(animate);
+    }
+
+    function start() {
+      if (rafId !== undefined) return;
+      animate();
+    }
+
+    function stop() {
+      if (rafId !== undefined) {
+        cancelAnimationFrame(rafId);
+        rafId = undefined;
+      }
+      renderFrame();
+    }
+
+    if (desktopQuery.matches) {
+      start();
+    } else {
+      renderFrame();
+    }
+
+    desktopQuery.addEventListener("change", (e) => {
+      if (e.matches) start();
+      else stop();
+    });
+  }
+
+  function setupShapeWhenReady(canvas: HTMLCanvasElement, index: number, attempt = 0) {
+    const size = canvas.clientWidth;
+
+    if (size === 0 && attempt < MAX_SIZE_RETRIES) {
+      requestAnimationFrame(() => setupShapeWhenReady(canvas, index, attempt + 1));
+      return;
+    }
+
+    try {
+      initShape(canvas, index, size || 80);
+    } catch (error) {
+      console.error(`[Pricing] No se pudo inicializar la forma 3D de la card ${index}:`, error);
+    }
+  }
+
+  function initAllShapes() {
+    document.querySelectorAll<HTMLCanvasElement>("[data-shape-canvas]").forEach((canvas, i) => {
+      setupShapeWhenReady(canvas, i);
+    });
+  }
+
+  // Esperamos a que la página (imágenes, fuentes, CSS) termine de cargar por completo
+  // antes de medir nada, en vez de correr apenas se evalúa este módulo.
+  if (document.readyState === "complete") {
+    initAllShapes();
+  } else {
+    window.addEventListener("load", initAllShapes, { once: true });
+  }
+</script>
