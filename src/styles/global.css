@@ -51,6 +51,17 @@ footer[id] {
   }
 }
 
+/* Oculta el scrollbar nativo del navegador en toda la página — lo reemplaza CustomScrollbar.astro
+   (barra curva rosa neón). Esto es adicional al overflow-x-hidden que ya tiene <html>/<body>
+   (Layout.astro) por el bug de scroll horizontal ya resuelto — no lo toca ni lo reemplaza. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 /*
  * Transición claro/oscuro: una barra fina recorre la pantalla de izquierda a
  * derecha revelando el nuevo tema por encima del anterior (View Transitions API,

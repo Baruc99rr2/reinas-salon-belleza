@@ -2,13 +2,15 @@
 import logoFull from "../assets/logo.png";
 import logoCrest from "../assets/logo2.png";
 
+// "Sobre mí" es una página aparte (/sobre-mi); el resto son anclas de la home, con barra
+// inicial (/#seccion en vez de #seccion) para que funcionen igual estando en /sobre-mi.
 const navLinks = [
-  { label: "Inicio", href: "#hero" },
-  { label: "Sobre mí", href: "#about" },
-  { label: "Mis habilidades", href: "#skills" },
-  { label: "Precios", href: "#pricing" },
-  { label: "Misión y Visión", href: "#mission" },
-  { label: "Contacto", href: "#contact" },
+  { label: "Inicio", href: "/#hero" },
+  { label: "Sobre mí", href: "/sobre-mi" },
+  { label: "Mis habilidades", href: "/#skills" },
+  { label: "Precios", href: "/#pricing" },
+  { label: "Misión y Visión", href: "/#mission" },
+  { label: "Contacto", href: "/#contact" },
 ];
 
 const desktopLinkClass =
@@ -32,7 +34,7 @@ const mobileLinkClass =
 >
   <nav class="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4">
     <a
-      href="#hero"
+      href="/#hero"
       aria-label="Estética Reina — Inicio"
       class="relative flex h-10 min-w-0 shrink items-center sm:h-14 md:h-16"
     >

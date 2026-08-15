@@ -1,5 +1,6 @@
 ---
 import bgVideo from "../assets/bg-hero.mp4";
+import WaveDivider from "./WaveDivider.astro";
 
 const words = ["brillar", "desconexión", "transformación", "puro cuidado"];
 
@@ -87,10 +88,6 @@ const scheduleDisplay = "Lun a Vie: 9 a 18hs";
     </div>
   </div>
 
-  {/* Fundido oscuro fijo hacia la siguiente sección: la parte inferior del video ya es oscura,
-     así que un degradado hacia negro/warmgray-900 funciona igual sin importar el tema activo. */}
-  <div class="absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-b from-transparent to-warmgray-900/90 sm:h-32 md:h-40" aria-hidden="true"></div>
-
   <div class="relative z-30 flex h-full flex-col items-center justify-center gap-1 px-6 pt-16 text-center sm:pt-20">
     <p class="font-display text-3xl leading-snug text-white sm:text-4xl md:text-5xl">Bienvenida</p>
     <p class="font-display text-2xl leading-snug text-white sm:text-3xl md:text-4xl">a tu momento de</p>
@@ -154,6 +151,18 @@ const scheduleDisplay = "Lun a Vie: 9 a 18hs";
       </span>
     </a>
   </div>
+
+  <WaveDivider
+    id="hero-gallery"
+    color1="#F7B2CB"
+    color2="#F28FB2"
+    color3="#FBD3E0"
+    color4="#908190"
+    darkColor1="#a9697f"
+    darkColor2="#c98ba0"
+    darkColor3="#5c5049"
+    darkColor4="#342c2c"
+  />
 </section>
 
 <style>

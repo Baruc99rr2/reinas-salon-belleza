@@ -1,5 +1,6 @@
 ---
 import { pricingPlans } from "../data/pricing";
+import WaveDivider from "./WaveDivider.astro";
 ---
 
 <section id="pricing" class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
@@ -16,8 +17,8 @@ import { pricingPlans } from "../data/pricing";
   <div class="relative z-10 mx-auto max-w-6xl">
     <div class="mb-12 text-center md:mb-16">
       <p class="font-sans text-xs font-semibold tracking-widest text-rose-500 uppercase dark:text-rose-muted">Precios</p>
-      <h2 class="mt-2 font-display text-3xl text-warmgray-800 md:text-5xl dark:text-warmgray-100">Nuestros planes</h2>
-      <p class="mx-auto mt-3 max-w-xl font-sans text-warmgray-600 dark:text-warmgray-400">
+      <h2 class="mt-2 font-display text-3xl text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)] md:text-5xl">Nuestros planes</h2>
+      <p class="mx-auto mt-3 max-w-xl font-sans text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
         Elegí el servicio que mejor se adapte a tu momento. Precios de referencia, consultanos por combinaciones a medida.
       </p>
     </div>
@@ -35,7 +36,7 @@ import { pricingPlans } from "../data/pricing";
                 data-card
                 data-index={i}
                 class:list={[
-                  "pricing-card absolute top-1/2 left-1/2 flex w-[min(72vw,20rem)] flex-col rounded-2xl border bg-white p-4 text-left shadow-lg sm:w-[min(80vw,20rem)] sm:p-6 dark:bg-warmgray-800",
+                  "pricing-card absolute top-1/2 left-1/2 flex w-[min(72vw,20rem)] flex-col rounded-2xl border bg-warmgray-900/55 p-4 text-left shadow-lg backdrop-blur-sm sm:w-[min(80vw,20rem)] sm:p-6 dark:bg-warmgray-900/70",
                   plan.featured
                     ? "border-rose-300 ring-2 ring-rose-200 dark:border-rose-muted dark:ring-rose-muted/25"
                     : "border-rose-100 dark:border-warmgray-700",
@@ -56,22 +57,22 @@ import { pricingPlans } from "../data/pricing";
                   aria-hidden="true"
                 />
 
-                <div class="relative z-10 flex flex-1 flex-col">
-                  <p class="font-sans text-xs font-semibold tracking-wide text-rose-500 uppercase dark:text-rose-muted">
+                <div class="relative z-10 flex flex-1 flex-col text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
+                  <p class="font-sans text-xs font-semibold tracking-wide text-white uppercase">
                     {plan.category}
                   </p>
-                  <h3 class="mt-1 font-display text-[clamp(1.125rem,5.5vw,1.5rem)] text-warmgray-800 dark:text-warmgray-100">
+                  <h3 class="mt-1 font-display text-[clamp(1.125rem,5.5vw,1.5rem)] text-white">
                     {plan.title}
                   </h3>
 
                   <p class="mt-4 flex items-baseline gap-1">
-                    <span class="font-display text-[clamp(1.375rem,7vw,1.875rem)] text-rose-600 dark:text-rose-muted">
+                    <span class="font-display text-[clamp(1.375rem,7vw,1.875rem)] text-white">
                       {plan.price === "A consultar" ? plan.price : `$${plan.price}`}
                     </span>
-                    {plan.period && <span class="font-sans text-sm text-warmgray-600 dark:text-warmgray-400">{plan.period}</span>}
+                    {plan.period && <span class="font-sans text-sm text-white">{plan.period}</span>}
                   </p>
 
-                  <ul class="mt-5 flex-1 space-y-2 font-sans text-sm text-warmgray-600 dark:text-warmgray-400">
+                  <ul class="mt-5 flex-1 space-y-2 font-sans text-sm text-white">
                     {plan.description.map((item) => (
                       <li class="flex items-start gap-2">
                         <svg
@@ -140,6 +141,18 @@ import { pricingPlans } from "../data/pricing";
       </div>
     </div>
   </div>
+
+  <WaveDivider
+    id="pricing-footer"
+    color1="#B23662"
+    color2="#7D716C"
+    color3="#4A413D"
+    color4="#2b2422"
+    darkColor1="#7D716C"
+    darkColor2="#4A413D"
+    darkColor3="#1c1715"
+    darkColor4="#000000"
+  />
 </section>
 
 <style>

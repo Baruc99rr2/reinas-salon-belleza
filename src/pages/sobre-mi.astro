@@ -1,0 +1,487 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Sobre mí | Estética Reina" description="Conocé el estudio de Estética Reina y a las personas detrás del salón.">
+  <Navbar />
+
+  <main>
+    <section id="studio-3d" class="relative h-[55vh] w-full overflow-hidden bg-warmgray-900 sm:h-[60vh] md:h-screen">
+      <canvas id="studio-canvas" class="absolute inset-0 h-full w-full"></canvas>
+    </section>
+
+    {/* Contenido HTML normal (no 3D) debajo del canvas — mismo patrón visual que el resto de
+       secciones: label chico en rosa (si hiciera falta), título en Playfair Display, párrafo
+       placeholder. */}
+    <section class="bg-rose-50 px-3 py-16 text-center sm:px-6 md:py-24 dark:bg-warmgray-900">
+      <div class="mx-auto max-w-2xl">
+        <h1 class="font-display text-4xl text-warmgray-800 md:text-5xl dark:text-warmgray-100">Sobre mí</h1>
+        {/* Placeholder genérico — reemplazar por la biografía real. */}
+        <p class="mx-auto mt-4 font-sans text-warmgray-600 dark:text-warmgray-400">
+          Detrás de Estética Reina hay años de formación, cursos y certificaciones en cuidado capilar, estética y bienestar. Cada
+          espacio del salón —y cada título en la pared de nuestro estudio— refleja ese compromiso con seguir aprendiendo para
+          ofrecerte siempre el mejor cuidado.
+        </p>
+
+        <button
+          type="button"
+          id="open-lightbox"
+          class="mt-6 rounded-full border border-rose-300 bg-white px-6 py-2.5 font-sans text-sm font-semibold text-rose-600 shadow-sm transition-colors hover:bg-rose-50 dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-rose-muted dark:hover:bg-warmgray-700"
+        >
+          Ver todos los títulos
+        </button>
+      </div>
+    </section>
+  </main>
+
+  {/* Lightbox: grilla con las 30 imágenes completas (mismo patrón de overlay que el modal de
+     MySkills — fixed, centrado, con blur de fondo y botón de cerrar). */}
+  <div
+    id="lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Todos los títulos y certificaciones"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-warmgray-900/80 p-4 backdrop-blur-sm dark:bg-black/85"
+  >
+    <div class="relative max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 dark:bg-warmgray-800">
+      <button
+        type="button"
+        id="close-lightbox"
+        aria-label="Cerrar"
+        class="sticky top-0 left-full z-10 -mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-warmgray-800 shadow-md transition-colors hover:bg-white dark:bg-warmgray-700/90 dark:text-warmgray-100 dark:hover:bg-warmgray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h2 class="font-display text-2xl text-warmgray-800 sm:text-3xl dark:text-warmgray-100">Títulos y certificaciones</h2>
+
+      <div id="lightbox-grid" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-4"></div>
+    </div>
+  </div>
+
+  {/* Paso 4: visor de imagen grande con navegación prev/next, se abre sobre la grilla del
+     lightbox al tocar cualquier miniatura. Fondo negro semitransparente propio (no el
+     bg-warmgray-900/80 + blur del lightbox de la grilla), z-index más alto para quedar encima. */}
+  <div
+    id="lightbox-viewer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Imagen ampliada"
+    class="fixed inset-0 z-[110] hidden items-center justify-center"
+    style="background-color: rgba(0, 0, 0, 0.85)"
+  >
+    <button
+      type="button"
+      id="viewer-close"
+      aria-label="Cerrar"
+      class="absolute top-4 right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition-colors hover:bg-white/20"
+    >
+      ✕
+    </button>
+
+    <button
+      type="button"
+      id="viewer-prev"
+      aria-label="Imagen anterior"
+      class="absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-4"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      id="viewer-next"
+      aria-label="Imagen siguiente"
+      class="absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-4"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+    <img id="viewer-image" src="" alt="" class="max-h-[85vh] max-w-[90vw] object-contain" />
+  </div>
+
+  <Footer />
+</Layout>
+
+<script>
+  import * as THREE from "three";
+  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+  import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+  import { gsap } from "gsap";
+  import titulo1 from "../assets/studies/titulo-1.jpg";
+  import titulo2 from "../assets/studies/titulo-2.jpg";
+  import titulo3 from "../assets/studies/titulo-3.jpg";
+  import titulo4 from "../assets/studies/titulo-4.jpg";
+  import titulo5 from "../assets/studies/titulo-5.jpg";
+  import titulo6 from "../assets/studies/titulo-6.jpg";
+
+  const WOOD_R = 0.9300053119659424;
+  const WOOD_G = 0.6934032440185547;
+  const WOOD_B = 0.38552701473236084;
+
+  // Paso 5 — hallazgo por inspección visual + raycasting/bounding boxes reales (no por nombre
+  // de nodo, que son genéricos: Cube004, Cube012, etc.): la pared del fondo con el banco largo
+  // y las dos repisas de madera está en Z ≈ -2.9 (mundo), y ocupa aprox. X: [-2.95, 2.95],
+  // Y: [0, 5.2]. Las dos repisas están muy arriba, cerca del techo (Y ≈ 4.4–4.9, X ≈ ±1.83–2.51,
+  // simétricas). El banco (con su escalón superior) llega hasta Y ≈ 2.29. Esto deja una franja
+  // libre en la pared entre Y ≈ 2.3 y Y ≈ 4.4 en todo el ancho, que es donde va la grilla de
+  // marcos. El reloj de pared, a diferencia de lo que sugiere sauna-reference.jpg, está en la
+  // pared CONTIGUA (la de la puerta), no en esta misma pared — confirmado con el modelo real
+  // cargado (raycasting), no asumido por la referencia. Por eso el encuadre cerrado del paso 6
+  // no es un plano perpendicular a esta pared sino un ángulo que conserva algo de esa esquina,
+  // para que el reloj siga visible sin que los marcos lo tapen (ya que ni siquiera están en la
+  // misma superficie).
+  const WALL_Z = -2.9;
+
+  // Paso 1 (ronda 2 de ajustes): tamaño *1.35 exacto y separación *1.3 exacto sobre los valores
+  // que ya venían (ver addTitleFrames). Con la grilla más grande el centro vertical se corrió de
+  // 3.265 a 3.529 — recalculado más abajo junto con las filas/columnas, no a mano.
+  const FRAME_GRID_CENTER = { x: 0, y: 3.529, z: WALL_Z };
+
+  const section = document.getElementById("studio-3d") as HTMLElement;
+  const canvas = document.getElementById("studio-canvas") as HTMLCanvasElement;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Paso 2: sombras suaves + tonemapping cinematográfico, valores exactos.
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+
+  const scene = new THREE.Scene();
+
+  // Paso 1 (ronda 3): fondo negro sólido y sin niebla — reemplaza el degradado verde agua +
+  // fog de la ronda anterior (light-reference.jpg pide negro plano detrás del modelo, con el
+  // brillo puesto en el piso reflectante, no en el fondo).
+  scene.background = new THREE.Color(0x000000);
+  scene.fog = null;
+
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+
+  // Ronda 4, paso 2: las 5 PointLight se crean más abajo, dentro del callback de carga del
+  // GLTF, porque sus posiciones dependen de center/size (el bounding box real del modelo) — acá
+  // arriba solo queda la ambient, bajada a 0.2.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+
+  // Paso 3 de la ronda anterior + ronda 4 (ajustes): spot dirigido a los 6 diplomas, además de
+  // las luces cálidas (no las reemplaza). Posición y target absolutos en coordenadas de mundo —
+  // igual que FRAME_GRID_CENTER, WALL_Z, etc., ya que el spot se agrega directo a `scene` (no
+  // anidado dentro del root del GLTF). Posición e intensidad SIN CAMBIOS respecto a la ronda
+  // anterior (según lo pedido): x=0 ya coincide con el centro X de la grilla, z=1.5 es el valor
+  // medido con lecturas de píxel reales que mejor cubre las 4 esquinas + centro de la grilla.
+  // Ronda 4, paso 3: color más dorado (0xFFC97A), haz más cerrado (Math.PI/10) y borde más
+  // marcado (penumbra 0.25) — para que se lea como un foco de galería definido, no una luz
+  // blanca difusa.
+  const titleSpot = new THREE.SpotLight(0xffc97a, 3.5, 0, Math.PI / 10, 0.25, 1.5);
+  titleSpot.position.set(0, 2.5, 1.5);
+  titleSpot.target.position.set(FRAME_GRID_CENTER.x, FRAME_GRID_CENTER.y, FRAME_GRID_CENTER.z);
+  titleSpot.castShadow = true;
+  titleSpot.shadow.mapSize.width = 1024;
+  titleSpot.shadow.mapSize.height = 1024;
+  scene.add(titleSpot, titleSpot.target);
+
+  function resize() {
+    const width = section.clientWidth;
+    const height = section.clientHeight;
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  window.addEventListener("resize", resize);
+
+  // Paso 7 (medidas originales) + paso 1 de la ronda 2 (agrandado): 6 marcos (imagen + respaldo
+  // en tono madera) en grilla 2x3, sobre la franja libre de la pared del fondo hallada en el
+  // paso 5. Cada dimensión de PlaneGeometry que se usaba antes (imageWidth/imageHeight,
+  // frameMargin → de ahí sale backingWidth/backingHeight) se multiplicó exactamente por 1.35;
+  // la separación entre marcos que se usaba antes (colSpacing 0.75, rowSpacing 0.9 — la
+  // distancia entre centros de columnas/filas) se multiplicó exactamente por 1.3.
+  //
+  // Con la grilla más grande, las filas se recalcularon para seguir centradas en la misma franja
+  // libre (entre el banco y las repisas) sin tocarlas: horizontalmente las columnas llegan como
+  // mucho a X≈±1.37, muy por debajo de donde arrancan las repisas (X≈±1.83) — así que un posible
+  // roce vertical con la banda Y de las repisas (≈4.41–4.91) no es un solapamiento real, nunca
+  // comparten el mismo X. El límite que sí es real es el banco (ocupa todo el ancho): la fila de
+  // abajo se ancló para dejarle el mismo margen (~0.15) que tenía la versión anterior.
+  function addTitleFrames() {
+    const textureLoader = new THREE.TextureLoader();
+    const images = [titulo1, titulo2, titulo3, titulo4, titulo5, titulo6];
+
+    const FRAME_SIZE_MULTIPLIER = 1.35;
+    const FRAME_GAP_MULTIPLIER = 1.3;
+
+    const imageWidth = 0.5 * FRAME_SIZE_MULTIPLIER; // 0.675
+    const imageHeight = imageWidth / 0.75; // 0.9 — mantiene la proporción real 3:4 del jpg
+    const frameMargin = 0.08 * FRAME_SIZE_MULTIPLIER; // 0.108
+    const backingWidth = imageWidth + frameMargin; // 0.783
+    const backingHeight = imageHeight + frameMargin; // 1.008
+
+    const colSpacing = 0.75 * FRAME_GAP_MULTIPLIER; // 0.975
+    const rowSpacing = 0.9 * FRAME_GAP_MULTIPLIER; // 1.17
+
+    const colXs = [-colSpacing, 0, colSpacing];
+    // Fila de abajo anclada a ~0.15 sobre el banco (Y top ≈ 2.29); la de arriba, una rowSpacing
+    // más arriba. Ninguna de las dos necesita respetar el límite de las repisas (Y ≈ 4.41) como
+    // techo estricto, por la separación en X explicada arriba.
+    const bottomRowY = 2.29 + 0.15 + backingHeight / 2;
+    const rowYs = [bottomRowY + rowSpacing, bottomRowY]; // arriba, abajo
+
+    const backingMaterial = new THREE.MeshBasicMaterial({ color: 0x5c4a32 }); // marco madera oscura
+
+    images.forEach((src, i) => {
+      const col = i % 3;
+      const row = Math.floor(i / 3);
+      const x = colXs[col];
+      const y = rowYs[row];
+
+      const backing = new THREE.Mesh(new THREE.PlaneGeometry(backingWidth, backingHeight), backingMaterial);
+      backing.position.set(x, y, WALL_Z + 0.03);
+      scene.add(backing);
+
+      const texture = textureLoader.load(src.src);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const imageMaterial = new THREE.MeshBasicMaterial({ map: texture });
+      const image = new THREE.Mesh(new THREE.PlaneGeometry(imageWidth, imageHeight), imageMaterial);
+      image.position.set(x, y, WALL_Z + 0.06);
+      scene.add(image);
+    });
+  }
+
+  // Paso 6: dolly desde la vista general (paso 4) hacia un encuadre cerrado de la pared del
+  // fondo (paso 5), con GSAP. Anima posición de cámara + un punto de mira separado (lookTarget)
+  // que se re-aplica en cada tick con onUpdate, porque camera.lookAt() no es una propiedad que
+  // GSAP pueda tweenear directamente.
+  function flyToWall(camera: THREE.PerspectiveCamera, generalPosition: THREE.Vector3, generalTarget: THREE.Vector3) {
+    const lookTarget = generalTarget.clone();
+    const closePosition = { x: 2.1, y: 3.5, z: 1.6 };
+    const closeTarget = { x: FRAME_GRID_CENTER.x + 0.3, y: FRAME_GRID_CENTER.y + 0.15, z: FRAME_GRID_CENTER.z + 0.6 };
+
+    camera.position.copy(generalPosition);
+    camera.lookAt(generalTarget);
+
+    const tl = gsap.timeline({ delay: 1.4, defaults: { duration: 3.2, ease: "power2.inOut" } });
+    tl.to(camera.position, { x: closePosition.x, y: closePosition.y, z: closePosition.z });
+    tl.to(
+      lookTarget,
+      {
+        x: closeTarget.x,
+        y: closeTarget.y,
+        z: closeTarget.z,
+        onUpdate: () => camera.lookAt(lookTarget),
+      },
+      0, // en paralelo con el tween de posición
+    );
+  }
+
+  const loader = new GLTFLoader();
+  loader.load(
+    "/studies/Sauna%20Room.gltf",
+    (gltf) => {
+      const root = gltf.scene;
+
+      // Paso 3: "Wood 1" y "Wood 8" vienen sin color (blancos) — les asignamos exactamente el
+      // tono de "Material.054" (baseColorFactor: [0.93, 0.6934, 0.3855]), que sí lo tiene.
+      // Paso 2: receiveShadow en todo el modelo (paredes, banco y piso están todos hechos de
+      // las mismas piezas de madera genéricas "Cube.NNN" — sin nombres descriptivos no hay una
+      // forma confiable de aislar solo esas tres cosas, así que se activa en todo el modelo, lo
+      // cual además incluye sin problema puerta/bisagras/balde). castShadow también en todo,
+      // para que haya sombras propias reales que recibir (banco/puerta proyectando sombra sobre
+      // el piso y la pared), no solo el sombreado direccional del material.
+      // Ronda 3, paso 2 anterior (revertido en esta ronda): "Cube002" seguía siendo el mesh de
+      // piso real (confirmado por raycast), pero el reflejo no va ahí — va en una base aparte
+      // debajo de todo el modelo (ver más abajo). Por eso este traverse ya NO reemplaza su
+      // material ni lo oculta: castShadow/receiveShadow y el fix de color de Wood 1/Wood 8 son
+      // lo único que sigue haciendo.
+      root.traverse((obj) => {
+        if (!(obj instanceof THREE.Mesh)) return;
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        materials.forEach((mat) => {
+          if ((mat.name === "Wood 1" || mat.name === "Wood 8") && mat instanceof THREE.MeshStandardMaterial) {
+            mat.color.setRGB(WOOD_R, WOOD_G, WOOD_B);
+          }
+        });
+      });
+
+      scene.add(root);
+
+      // Vista general (paso 4): encuadre calculado desde el bounding box REAL del modelo ya
+      // cargado (no una posición de cámara inventada a ojo) — arriba y al costado, mirando al
+      // centro real de la habitación. El mismo box/center/size se reusa abajo para la base
+      // reflectante y las 5 luces — un solo cálculo, no uno por función.
+      const box = new THREE.Box3().setFromObject(root);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+
+      // Ronda 4, paso 1: base/tarima reflectante debajo de TODO el modelo (no el piso interior
+      // del cuarto) — 3 veces más grande que el lado mayor del modelo, apenas debajo del punto
+      // más bajo real (box.min.y), así se ve sobresalir más allá de las paredes del cuarto.
+      const baseSize = Math.max(size.x, size.z) * 3;
+      const baseGeometry = new THREE.PlaneGeometry(baseSize, baseSize);
+      baseGeometry.rotateX(-Math.PI / 2);
+
+      const baseReflector = new Reflector(baseGeometry, {
+        clipBias: 0.003,
+        textureWidth: 1024,
+        textureHeight: 1024,
+        color: 0x5c8080,
+      });
+      baseReflector.position.set(center.x, box.min.y - 0.01, center.z);
+      scene.add(baseReflector);
+
+      // Ronda 4, paso 2: 5 PointLight cálidas en vez de key+fill, todas calculadas en relación a
+      // este mismo center/size (nada de coordenadas absolutas inventadas).
+      const lights = [
+        { pos: [center.x - size.x * 0.4, center.y + size.y * 0.3, center.z + size.z * 0.3], color: 0xffcc66, intensity: 2.2 },
+        { pos: [center.x + size.x * 0.4, center.y + size.y * 0.3, center.z + size.z * 0.3], color: 0xffcc66, intensity: 2.2 },
+        { pos: [center.x, center.y + size.y * 0.45, center.z - size.z * 0.3], color: 0xffe0b3, intensity: 1.4 },
+        { pos: [center.x - size.x * 0.3, center.y - size.y * 0.1, center.z + size.z * 0.4], color: 0xff9f55, intensity: 1.0 },
+        { pos: [center.x + size.x * 0.3, center.y - size.y * 0.1, center.z + size.z * 0.4], color: 0xff9f55, intensity: 1.0 },
+      ] as const;
+      lights.forEach((l) => {
+        const light = new THREE.PointLight(l.color, l.intensity, size.x * 2.5, 2);
+        light.position.set(...l.pos);
+        light.castShadow = true;
+        light.shadow.mapSize.set(512, 512);
+        // 5 mapas de sombra cúbicos tan cerca de la geometría (a esta escala, ~2-3 unidades)
+        // producían shadow acne severo con el bias por defecto — se veía como una neblina/
+        // ondulado lechoso tapando toda la madera. Confirmado aislando causa por causa (probé
+        // sin el Reflector primero, seguía igual; recién al sacar las sombras de las 5 luces
+        // desapareció) antes de tocar nada. Un bias negativo chico lo resuelve sin sacar
+        // castShadow, que es justo lo que se pidió.
+        light.shadow.bias = -0.005;
+        scene.add(light);
+      });
+
+      const generalPosition = new THREE.Vector3(center.x + maxDim * 0.75, center.y + maxDim * 0.55, center.z + maxDim * 0.75);
+      camera.position.copy(generalPosition);
+      camera.lookAt(center);
+      camera.updateProjectionMatrix();
+
+      resize();
+      addTitleFrames();
+      flyToWall(camera, generalPosition, center);
+    },
+    undefined,
+    (error) => {
+      console.error("[sobre-mi] Error cargando Sauna Room.gltf:", error);
+    },
+  );
+
+  resize();
+
+  // Loop de render continuo (no un render puntual): lo necesita la animación de cámara del
+  // paso 6, y de paso evita que el canvas se quede en un frame viejo/en blanco si el navegador
+  // resetea el contexto WebGL (pestaña en segundo plano, cambio de GPU, etc.).
+  renderer.setAnimationLoop(() => {
+    renderer.render(scene, camera);
+  });
+</script>
+
+<script>
+  // --- Lightbox (paso 8): grilla con las 30 imágenes completas, cargadas con import.meta.glob
+  // en vez de 30 imports a mano — se ordenan por el número en el nombre de archivo porque las
+  // claves del glob no vienen garantizadas en orden numérico (titulo-10 antes que titulo-2, por
+  // orden alfabético). ---
+  const modules = import.meta.glob<{ default: { src: string } }>("../assets/studies/titulo-*.jpg", { eager: true });
+
+  const images = Object.entries(modules)
+    .map(([path, mod]) => {
+      const match = path.match(/titulo-(\d+)\.jpg$/);
+      return { num: match ? parseInt(match[1], 10) : 0, src: mod.default.src };
+    })
+    .sort((a, b) => a.num - b.num);
+
+  const grid = document.getElementById("lightbox-grid");
+  images.forEach(({ num, src }, index) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `Título o certificación ${num} de Estética Reina`;
+    img.loading = "lazy";
+    img.className = "aspect-[3/4] w-full cursor-pointer rounded-lg object-cover shadow-sm transition-transform hover:scale-[1.03]";
+    img.addEventListener("click", () => openViewer(index));
+    grid?.appendChild(img);
+  });
+
+  const lightbox = document.getElementById("lightbox");
+  const openBtn = document.getElementById("open-lightbox");
+  const closeBtn = document.getElementById("close-lightbox");
+
+  function openLightbox() {
+    lightbox?.classList.remove("hidden");
+    lightbox?.classList.add("flex");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    lightbox?.classList.add("hidden");
+    lightbox?.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
+
+  openBtn?.addEventListener("click", openLightbox);
+  closeBtn?.addEventListener("click", closeLightbox);
+
+  lightbox?.addEventListener("click", (event) => {
+    if (event.target === lightbox) closeLightbox();
+  });
+
+  // --- Paso 4: visor grande con prev/next, se abre encima de la grilla al tocar una miniatura.
+  // Da la vuelta completa (de la 30 a la 1 y viceversa) con el mismo módulo `%` que ya usa el
+  // carrusel de Pricing para su wrap-around. ---
+  const viewer = document.getElementById("lightbox-viewer");
+  const viewerImage = document.getElementById("viewer-image") as HTMLImageElement;
+  const viewerClose = document.getElementById("viewer-close");
+  const viewerPrev = document.getElementById("viewer-prev");
+  const viewerNext = document.getElementById("viewer-next");
+
+  let viewerIndex = 0;
+
+  function showViewerImage(index: number) {
+    viewerIndex = ((index % images.length) + images.length) % images.length;
+    const current = images[viewerIndex];
+    viewerImage.src = current.src;
+    viewerImage.alt = `Título o certificación ${current.num} de Estética Reina`;
+  }
+
+  function openViewer(index: number) {
+    showViewerImage(index);
+    viewer?.classList.remove("hidden");
+    viewer?.classList.add("flex");
+  }
+
+  function closeViewer() {
+    viewer?.classList.add("hidden");
+    viewer?.classList.remove("flex");
+  }
+
+  viewerClose?.addEventListener("click", closeViewer);
+  viewerPrev?.addEventListener("click", () => showViewerImage(viewerIndex - 1));
+  viewerNext?.addEventListener("click", () => showViewerImage(viewerIndex + 1));
+
+  viewer?.addEventListener("click", (event) => {
+    if (event.target === viewer) closeViewer();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const viewerIsOpen = !viewer?.classList.contains("hidden");
+    if (viewerIsOpen) {
+      if (event.key === "Escape") closeViewer();
+      if (event.key === "ArrowLeft") showViewerImage(viewerIndex - 1);
+      if (event.key === "ArrowRight") showViewerImage(viewerIndex + 1);
+      return;
+    }
+    if (event.key === "Escape") closeLightbox();
+  });
+</script>

@@ -1,0 +1,174 @@
+{/* Scrollbar curvo personalizado para toda la página (no un contenedor chico): un <path> SVG
+   dibuja el track con una curva decorativa fija en cada extremo, y un segundo <path> —con el
+   mismo "d", pero recortado con stroke-dasharray/stroke-dashoffset— hace de thumb. Adaptado de
+   la técnica clásica de "scrollbar SVG con Pointer Events siguiendo un path": trackeamos el
+   scroll de toda la página (window.scrollY/document.documentElement.scrollHeight/
+   window.innerHeight) en vez del .scroll-content interno del demo original, y el radio de las
+   curvas es un valor fijo (RADIUS más abajo) en vez de leído de getComputedStyle().borderRadius,
+   ya que el body de este sitio no tiene border-radius. */}
+<svg id="custom-scrollbar-svg" aria-hidden="true" preserveAspectRatio="none">
+  <path id="scrollbar-track" class="scrollbar-track" fill="none" stroke-width="2"></path>
+  <path id="scrollbar-thumb" class="scrollbar-thumb" fill="none" stroke-width="4" stroke-linecap="round"></path>
+</svg>
+
+<style>
+  #custom-scrollbar-svg {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 28px;
+    /* Por encima del Navbar (z-50) para que el scrollbar siempre quede visible sobre él. */
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  .scrollbar-track {
+    stroke: rgba(0, 0, 0, 0.1);
+  }
+
+  :global(.dark) .scrollbar-track {
+    stroke: rgba(255, 255, 255, 0.15);
+  }
+
+  .scrollbar-thumb {
+    /* Único elemento con pointer-events:auto — el resto del SVG (y del track) lo tiene en none,
+       así el scrollbar nunca tapa clicks en el contenido de abajo salvo sobre el propio thumb. */
+    pointer-events: auto;
+    cursor: grab;
+    stroke: #ff2e9e;
+    filter: drop-shadow(0 0 3px #ff2e9e) drop-shadow(0 0 8px #ff2e9e);
+    transition:
+      stroke 150ms ease,
+      filter 150ms ease;
+  }
+
+  .scrollbar-thumb:active {
+    cursor: grabbing;
+    stroke: #ff5cb8;
+    filter: drop-shadow(0 0 4px #ff5cb8) drop-shadow(0 0 10px #ff5cb8);
+  }
+</style>
+
+<script>
+  // Geometría del "gancho en L" en cada extremo (px). Reemplazo completo de la curva anterior
+  // (pensada para una caja ancha de ~600px, no para esta tira vertical angosta): ahora la línea
+  // vertical corre pegada al borde derecho real de la pantalla y, cerca de arriba/abajo, dobla en
+  // escuadra hacia la izquierda con un tramo horizontal (HOOK) unido por un arco (RADIUS).
+  const W = 28; // ancho del SVG
+  const EDGE = 4; // distancia entre la línea vertical y el borde derecho real de la pantalla
+  const PAD = 4; // distancia desde arriba/abajo de la pantalla
+  const HOOK = 14; // longitud del tramo horizontal (el "doblez en L")
+  const RADIUS = 10; // radio de la curva que conecta el tramo horizontal con el vertical
+
+  // Largo mínimo del thumb (px de recorrido sobre el path), para que siga siendo agarrable con
+  // el dedo/mouse aunque la página sea muy larga y el thumb "real" proporcional saldría chico.
+  const MIN_THUMB_LENGTH = 40;
+
+  const svg = document.getElementById("custom-scrollbar-svg") as unknown as SVGSVGElement;
+  const track = document.getElementById("scrollbar-track") as unknown as SVGPathElement;
+  const thumb = document.getElementById("scrollbar-thumb") as unknown as SVGPathElement;
+
+  let totalLength = 0;
+  let isDragging = false;
+
+  function buildPath(height: number) {
+    const trackX = W - EDGE;
+    const topY = PAD;
+    const bottomY = height - PAD;
+    const hookStartX = trackX - HOOK;
+    const cornerX = trackX - RADIUS;
+
+    return `
+      M ${hookStartX} ${topY}
+      L ${cornerX} ${topY}
+      A ${RADIUS} ${RADIUS} 0 0 1 ${trackX} ${topY + RADIUS}
+      L ${trackX} ${bottomY - RADIUS}
+      A ${RADIUS} ${RADIUS} 0 0 1 ${cornerX} ${bottomY}
+      L ${hookStartX} ${bottomY}
+    `;
+  }
+
+  function setup() {
+    const width = svg.clientWidth;
+    const height = svg.clientHeight;
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+    const d = buildPath(height);
+    track.setAttribute("d", d);
+    thumb.setAttribute("d", d);
+    totalLength = thumb.getTotalLength();
+
+    updateThumb();
+  }
+
+  function updateThumb() {
+    const scrollTop = window.scrollY;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
+    const maxScroll = scrollHeight - clientHeight;
+
+    // Nada para scrollear: no tiene sentido mostrar un thumb que ocuparía todo el track.
+    if (maxScroll <= 0) {
+      svg.style.display = "none";
+      return;
+    }
+    svg.style.display = "";
+
+    const thumbLength = Math.min(totalLength, Math.max(MIN_THUMB_LENGTH, (clientHeight / scrollHeight) * totalLength));
+    const ratio = Math.min(1, Math.max(0, scrollTop / maxScroll));
+    const startPos = ratio * (totalLength - thumbLength);
+
+    thumb.style.strokeDasharray = `${thumbLength} ${totalLength}`;
+    thumb.style.strokeDashoffset = String(-startPos);
+  }
+
+  // ratio en base a la posición del puntero dentro del alto de pantalla (el track ocupa el
+  // 100vh completo) — igual de simple que el original, sin depender de dónde arrancó el drag.
+  function scrollFromClientY(clientY: number) {
+    const ratio = Math.min(1, Math.max(0, clientY / window.innerHeight));
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
+    // behavior:'instant' (no 'auto'): 'auto' hereda el scroll-behavior:smooth global del <html>
+    // (el que usa el Navbar para las anclas) y cada salto del drag se animaba de a poco, con
+    // delay. 'instant' salta directo sin tocar ese scroll-behavior global, así que las anclas
+    // del Navbar siguen animándose igual que antes.
+    window.scrollTo({ top: ratio * (scrollHeight - clientHeight), behavior: "instant" });
+    updateThumb();
+  }
+
+  thumb.addEventListener("pointerdown", (event) => {
+    isDragging = true;
+    // setPointerCapture puede tirar NotFoundError en algunos casos (ej. eventos sintéticos sin
+    // un pointer activo real detrás); no debe frenar el salto de scroll, que es lo que importa.
+    try {
+      thumb.setPointerCapture(event.pointerId);
+    } catch {
+      /* noop */
+    }
+    scrollFromClientY(event.clientY);
+  });
+
+  thumb.addEventListener("pointermove", (event) => {
+    if (!isDragging) return;
+    scrollFromClientY(event.clientY);
+  });
+
+  function stopDrag(event: PointerEvent) {
+    if (!isDragging) return;
+    isDragging = false;
+    try {
+      thumb.releasePointerCapture(event.pointerId);
+    } catch {
+      /* noop */
+    }
+  }
+
+  thumb.addEventListener("pointerup", stopDrag);
+  thumb.addEventListener("pointercancel", stopDrag);
+
+  window.addEventListener("scroll", updateThumb, { passive: true });
+  window.addEventListener("resize", setup);
+
+  setup();
+</script>

@@ -10,6 +10,7 @@ import img5 from "../assets/carrousel/carrousel-5.jpg";
 import img6 from "../assets/carrousel/carrousel-6.jpg";
 import img7 from "../assets/carrousel/carrousel-7.jpg";
 import img8 from "../assets/carrousel/carrousel-8.jpg";
+import WaveDivider from "./WaveDivider.astro";
 
 // El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda
 // central (columna 2, fila 2) es el video; las 8 fotos se reparten en el resto en orden.
@@ -85,6 +86,18 @@ const imageClass =
       </div>
     </div>
   </div>
+
+  <WaveDivider
+    id="gallery-skills"
+    color1="#F7B2CB"
+    color2="#F28FB2"
+    color3="#FBD3E0"
+    color4="#996773"
+    darkColor1="#a9697f"
+    darkColor2="#c98ba0"
+    darkColor3="#5c5049"
+    darkColor4="#352a29"
+  />
 </section>
 
 <style>
