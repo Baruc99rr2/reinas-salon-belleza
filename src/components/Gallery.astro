@@ -1,36 +1,47 @@
 ---
+import type { ImageMetadata } from "astro";
 import { Image, Picture, getImage } from "astro:assets";
 import bgGalleryImg from "../assets/carrousel/bg-carrousel.png";
 import logoCrest from "../assets/logo2.png";
-import galleryVideo from "../assets/carrousel/carrousel-9.mp4";
-import galleryPosterImg from "../assets/posters/carrousel-9-poster.jpg";
 import img3 from "../assets/carrousel/carrousel-3.png";
 import img4 from "../assets/carrousel/carrousel-4.webp";
 import img5 from "../assets/carrousel/carrousel-5.jpg";
-import img6 from "../assets/carrousel/carrousel-6.jpg";
 import { salonPhotos } from "../data/salon";
 import WaveDivider from "./WaveDivider.astro";
 import { contact } from "../data/contact";
 import { cssBackground } from "../lib/images";
 
-// Solo servicios que el salón ofrece. Las fotos de peinado, maquillaje y pedicura se reemplazaron
-// por fotos reales del salón (data/salon.ts), elegidas para que no se repitan entre sí.
+// Video propio (opcional) para la celda central: si existe src/assets/videos/galeria.mp4 se usa, con
+// src/assets/videos/galeria-poster.(jpg|png|webp) como portada si está. Si no hay video, la celda
+// central muestra una foto del salón. Ver "Imágenes y videos" en el README.
+const ownVideoUrl = Object.values(
+  import.meta.glob<string>("../assets/videos/galeria.mp4", { eager: true, query: "?url", import: "default" }),
+)[0];
+const ownPosterImg = Object.values(
+  import.meta.glob<{ default: ImageMetadata }>("../assets/videos/galeria-poster.{jpg,jpeg,png,webp}", { eager: true }),
+)[0]?.default;
+
+// Solo servicios que el salón ofrece y fotos reales del salón (data/salon.ts), sin repetir. Las de
+// stock que quedan (3, 4 y 5) muestran servicios reales; no hay fotos propias de esos servicios.
 const photos = {
   1: { src: salonPhotos.cabina.image, alt: salonPhotos.cabina.alt },
   2: { src: salonPhotos.equipo.image, alt: salonPhotos.equipo.alt },
   3: { src: img3, alt: "Masaje con piedras calientes sobre la espalda" },
   4: { src: img4, alt: "Esteticista haciendo un tratamiento de aparatología en camilla" },
   5: { src: img5, alt: "Aplicación de mascarilla facial con pincel" },
-  6: { src: img6, alt: "Interior de un salón con sillones y estantería iluminada" },
+  6: { src: salonPhotos.rincon.image, alt: salonPhotos.rincon.alt },
   7: { src: salonPhotos.noche.image, alt: salonPhotos.noche.alt },
-  8: { src: salonPhotos.rincon.image, alt: salonPhotos.rincon.alt },
+  // Misma cabina que la 1 pero con otra luz: va en la esquina opuesta del grid.
+  8: { src: salonPhotos.cabinaLed.image, alt: salonPhotos.cabinaLed.alt },
+  centro: { src: salonPhotos.tocador.image, alt: salonPhotos.tocador.alt },
 };
 
-// El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda
-// central (columna 2, fila 2) es el video; las 8 fotos se reparten en el resto en orden.
+// El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda central
+// (columna 2, fila 2) lleva la corona encima: el video propio si existe, si no la foto del tocador.
+const center = ownVideoUrl ? null : photos.centro;
 const columns = [
   [photos[1], photos[4], photos[6]],
-  [photos[2], null, photos[7]],
+  [photos[2], center, photos[7]],
   [photos[3], photos[5], photos[8]],
 ];
 
@@ -39,7 +50,10 @@ const columns = [
 const photoSizes = "(min-width: 640px) min(42vmin, 540px), 54vw";
 
 const bgGallery = await cssBackground(bgGalleryImg);
-const galleryPoster = await getImage({ src: galleryPosterImg, format: "webp", quality: 75 });
+// Portada del video: la suya si está; si no, la foto del tocador (lo que se vería sin video).
+const videoPoster = ownVideoUrl
+  ? await getImage({ src: ownPosterImg ?? photos.centro.src, format: "webp", width: 1080, quality: 75 })
+  : undefined;
 
 const imageClass =
   "absolute inset-0 h-full w-full object-cover saturate-75 brightness-95 transition-all duration-500 " +
@@ -78,7 +92,8 @@ const imageClass =
         {
           columns.map((column) => (
             <div data-col>
-              {column.map((cell) => {
+              {column.map((cell, rowIndex) => {
+                const isCenter = column === columns[1] && rowIndex === 1;
                 return (
                   <article
                     data-cell
@@ -99,24 +114,23 @@ const imageClass =
                         class={imageClass}
                       />
                     ) : (
-                      <>
-                        {/* Arranca recién cuando la celda entra en pantalla (ver script). Hasta entonces se
-                           ve la portada: el primer frame del propio video. */}
-                        <video
-                          class={imageClass}
-                          src={galleryVideo}
-                          poster={galleryPoster.src}
-                          data-autoplay-visible
-                          loop
-                          muted
-                          playsinline
-                          preload="metadata"
-                          aria-hidden="true"
-                        />
-                        <div class="absolute inset-0 flex items-center justify-center bg-warmgray-900/20">
-                          <Image src={logoCrest} width={180} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-1/3 w-1/3 object-contain opacity-80 drop-shadow-lg" />
-                        </div>
-                      </>
+                      // Video propio: arranca recién cuando la celda entra en pantalla (ver script).
+                      <video
+                        class={imageClass}
+                        src={ownVideoUrl}
+                        poster={videoPoster?.src}
+                        data-autoplay-visible
+                        loop
+                        muted
+                        playsinline
+                        preload="metadata"
+                        aria-hidden="true"
+                      />
+                    )}
+                    {isCenter && (
+                      <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-warmgray-900/20">
+                        <Image src={logoCrest} width={180} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-1/3 w-1/3 object-contain opacity-80 drop-shadow-lg" />
+                      </div>
                     )}
                   </article>
                 );

@@ -64,9 +64,17 @@ publicado solo hay versiones WebP/AVIF al tamaño necesario, nunca los originale
 - Para fondos por CSS se usa `cssBackground()` de `src/lib/images.ts`.
 - **No leer propiedades de una imagen importada** (`imagen.src`, `imagen.width`...): Astro lo toma
   como que se usa el original y lo copia completo a `dist/`.
-- Los videos tienen portada (`poster`) sacada de su primer frame, en `src/assets/posters/`. Si se
-  cambia un video, regenerarla, por ejemplo con
+- El video del Hero tiene portada (`poster`) sacada de su primer frame, en `src/assets/posters/`. Si
+  se cambia el video, regenerarla, por ejemplo con
   `ffmpeg -i video.mp4 -frames:v 1 -q:v 2 video-poster.jpg`.
+- **Video de la Galería (opcional).** La celda central de la Galería muestra una foto del salón.
+  Para poner un video propio:
+  1. Guardalo como `src/assets/videos/galeria.mp4` (corto, sin sonido; se reproduce en loop y
+     solo mientras está en pantalla).
+  2. Opcional: su portada como `src/assets/videos/galeria-poster.jpg` (o `.png`/`.webp`), por
+     ejemplo con `ffmpeg -i galeria.mp4 -frames:v 1 -q:v 2 galeria-poster.jpg`. Sin portada se usa
+     la foto del tocador.
+  3. `npm run build`: el sitio lo detecta solo. Para volver a la foto, borrá el archivo.
 
 ## Estructura
 

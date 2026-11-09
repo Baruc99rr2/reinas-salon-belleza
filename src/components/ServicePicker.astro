@@ -64,7 +64,10 @@ const firstBg = bgUrls[0] ?? "";
        horizontal en otra sección de esta página). */}
     <div class="relative overflow-x-hidden [touch-action:pan-y]" data-carousel>
       <div class="relative h-[380px] overflow-hidden sm:h-[360px] md:[perspective:1400px]" data-stage>
-        <div class="absolute inset-0 md:[transform-style:preserve-3d]" data-track>
+        {/* pointer-events-none: en desktop el track comparte el espacio 3D con las tarjetas; mientras la
+           tarjeta activa gira viene "desde atrás" (translateZ negativo) y el track, en Z=0, se quedaba
+           con el clic. Cada tarjeta fija su propio pointer-events (solo la activa recibe clics). */}
+        <div class="pointer-events-none absolute inset-0 md:[transform-style:preserve-3d]" data-track>
           {
             skillCategories.map((category, i) => (
               <article
