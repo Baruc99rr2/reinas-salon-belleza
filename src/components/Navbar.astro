@@ -169,6 +169,28 @@ const mobileLinkClass =
     padding-block: 0.5rem;
   }
 
+  /* Al hacer scroll el Navbar toma fondo propio: vidrio oscuro con desenfoque, en los dos temas.
+     Los links son blancos fijos, así que se leen sobre cualquier sección (fotos, crema de Volver al
+     Origen, rosa claro de /sobre-mi): contraste ≥ 7:1 incluso sobre blanco puro. Estos estilos no
+     tienen capa (@layer), así que le ganan a las clases bg-white/10 de Tailwind del <header>. */
+  #site-header {
+    transition:
+      background-color 400ms ease,
+      box-shadow 400ms ease,
+      backdrop-filter 400ms ease;
+  }
+
+  #site-header.is-scrolled {
+    background-color: rgb(43 36 34 / 0.78);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.45);
+  }
+
+  :global(.dark) #site-header.is-scrolled {
+    background-color: rgb(20 17 16 / 0.82);
+  }
+
   /* Animación stagger de los links al desplegar el menú mobile */
   #mobile-menu li {
     opacity: 0;
