@@ -2,16 +2,26 @@
 import { pricingPlans } from "../data/pricing";
 import WaveDivider from "./WaveDivider.astro";
 import PricingFlower from "./PricingFlower.astro";
+import { getImage } from "astro:assets";
+
+// Fondos optimizados (WebP, 1920px o el tamaño original si es menor) de cada plan, en el mismo orden que pricingPlans. El
+// script los lee de data-bg-urls para el cross-fade; "" = plan sin imagen (no cambia el fondo).
+const bgUrls = await Promise.all(
+  pricingPlans.map(async (plan) =>
+    plan.bgImage ? (await getImage({ src: plan.bgImage, format: "webp", width: 1920, quality: 72 })).src : "",
+  ),
+);
+const firstBg = bgUrls.find((url) => url !== "") ?? "";
 ---
 
-<section id="pricing" class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
+<section id="pricing" data-bg-urls={JSON.stringify(bgUrls)} class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
   {/* Fondo de la sección: la imagen del plan activo, en dos capas <img> superpuestas para el
      cross-fade (ver script + .pricing-bg-layer más abajo) — nunca se corta de golpe, siempre
      hay una entrando en opacity mientras la otra sale. Mismo overlay que en MySkills/Gallery
      para que el texto siga siendo legible encima en los dos temas. */}
   <div class="absolute inset-0 z-0" aria-hidden="true">
-    <img data-pricing-bg src={pricingPlans[0].bgImage?.src} alt="" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-100" />
-    <img data-pricing-bg src={pricingPlans[0].bgImage?.src} alt="" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-0" />
+    <img data-pricing-bg src={firstBg} alt="" loading="lazy" decoding="async" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-100" />
+    <img data-pricing-bg src={firstBg} alt="" loading="lazy" decoding="async" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-0" />
   </div>
   <div class="absolute inset-0 z-0 bg-warmgray-900/45 dark:bg-warmgray-900/75" aria-hidden="true" />
 
@@ -206,14 +216,13 @@ import PricingFlower from "./PricingFlower.astro";
 </style>
 
 <script>
-  import { pricingPlans } from "../data/pricing";
-
   const stage = document.querySelector<HTMLElement>("[data-carousel]");
   const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-card]"));
   const dots = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-dot]"));
   const prevBtn = document.querySelector<HTMLButtonElement>("[data-prev]");
   const nextBtn = document.querySelector<HTMLButtonElement>("[data-next]");
   const bgLayers = Array.from(document.querySelectorAll<HTMLImageElement>("[data-pricing-bg]"));
+  const bgUrls: string[] = JSON.parse(document.querySelector<HTMLElement>("#pricing")?.dataset.bgUrls ?? "[]");
   const total = cards.length;
 
   const AUTOPLAY_MS = 4500;
@@ -241,14 +250,14 @@ import PricingFlower from "./PricingFlower.astro";
   let frontBgIndex = 0;
 
   function setBackground(index: number) {
-    const bgImage = pricingPlans[index]?.bgImage;
-    if (!bgImage || bgLayers.length < 2) return;
+    const bgUrl = bgUrls[index];
+    if (!bgUrl || bgLayers.length < 2) return;
 
     const backIndex = frontBgIndex === 0 ? 1 : 0;
     const frontLayer = bgLayers[frontBgIndex];
     const backLayer = bgLayers[backIndex];
 
-    backLayer.src = bgImage.src;
+    backLayer.src = bgUrl;
     backLayer.style.opacity = "1";
     frontLayer.style.opacity = "0";
     frontBgIndex = backIndex;

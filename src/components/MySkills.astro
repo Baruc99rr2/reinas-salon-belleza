@@ -1,9 +1,25 @@
 ---
+import { Image, getImage } from "astro:assets";
 import { skillCategories } from "../data/skills";
 import logoImg from "../assets/logo.png";
 import bgCardImg from "../assets/bg-card.png";
 import bgSkillImg from "../assets/bg-skill.png";
+import card1 from "../assets/card/card-1.avif";
+import card2 from "../assets/card/card-2.avif";
+import card3 from "../assets/card/card-3.png";
+import card4 from "../assets/card/card-4.jpg";
 import WaveDivider from "./WaveDivider.astro";
+import { cssBackground } from "../lib/images";
+
+const bgSkill = await cssBackground(bgSkillImg);
+// Fondo decorativo de la cara "servicios" (25% de opacidad): con 1200px alcanza.
+const bgCard = await getImage({ src: bgCardImg, format: "webp", width: 1200, quality: 70 });
+
+// Foto de cada categoría (mismo orden que skillCategories en data/skills.ts). La tarjeta mide como
+// mucho 380px de ancho → 760px cubre pantallas retina. El script las toma de data-category-images.
+const categoryImages = await Promise.all(
+  [card1, card2, card3, card4].map(async (src) => (await getImage({ src, format: "webp", width: 760, quality: 78 })).src),
+);
 ---
 
 <section id="skills" class="relative bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
@@ -14,7 +30,7 @@ import WaveDivider from "./WaveDivider.astro";
   <div
     aria-hidden="true"
     class="pointer-events-none absolute inset-0 z-0 min-h-full dark:opacity-20"
-    style={`background-image: url(${bgSkillImg.src}); background-size: cover; background-position: center; background-repeat: no-repeat;`}
+    style={`${bgSkill.style} background-size: cover; background-position: center; background-repeat: no-repeat;`}
   />
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 min-h-full bg-warmgray-900/45 dark:bg-warmgray-900/75" />
 
@@ -98,6 +114,7 @@ import WaveDivider from "./WaveDivider.astro";
   {/* Overlay / modal a pantalla completa */}
   <div
     data-modal
+    data-category-images={JSON.stringify(categoryImages)}
     role="dialog"
     aria-modal="true"
     aria-label="Detalle de la categoría"
@@ -142,10 +159,10 @@ import WaveDivider from "./WaveDivider.astro";
           {/* Caja de 6 caras real: logo (frente) + servicios (reverso, a 180°) + 4 risers
              (arriba/abajo/izquierda/derecha) que cierran el volumen entre ambas por igual. */}
           <div data-face="logo" class="skill-face skill-face-logo">
-            <img src={logoImg.src} width={logoImg.width} height={logoImg.height} alt="" aria-hidden="true" class="h-auto max-h-[55%] w-auto max-w-[60%] object-contain" />
+            <Image src={logoImg} width={240} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-auto max-h-[55%] w-auto max-w-[60%] object-contain" />
           </div>
 
-          <div data-face="services" class="skill-face skill-face-services" style={`--card-bg-image: url(${bgCardImg.src})`}>
+          <div data-face="services" class="skill-face skill-face-services" style={`--card-bg-image: url(${bgCard.src})`}>
             <div
               aria-hidden="true"
               class="pointer-events-none absolute inset-0 z-0 opacity-25 dark:opacity-10"
@@ -362,13 +379,9 @@ import WaveDivider from "./WaveDivider.astro";
 <script>
   import { gsap } from "gsap";
   import { skillCategories } from "../data/skills";
-  import card1 from "../assets/card/card-1.png";
-  import card2 from "../assets/card/card-2.png";
-  import card3 from "../assets/card/card-3.png";
-  import card4 from "../assets/card/card-4.png";
 
   // Mismo orden que skillCategories en data/skills.ts.
-  const categoryImages = [card1, card2, card3, card4];
+  const categoryImages: string[] = JSON.parse(document.querySelector<HTMLElement>("[data-modal]")?.dataset.categoryImages ?? "[]");
 
   const cards = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-skill-card]"));
   const modal = document.querySelector<HTMLElement>("[data-modal]");
@@ -452,7 +465,7 @@ import WaveDivider from "./WaveDivider.astro";
 
     if (backTitle) backTitle.textContent = category.title;
     if (backImage) {
-      backImage.src = categoryImages[index]?.src ?? "";
+      backImage.src = categoryImages[index] ?? "";
       backImage.alt = `Trabajo de ${category.title}`;
     }
     if (labelRight) labelRight.textContent = category.label;

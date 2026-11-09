@@ -19,8 +19,8 @@ const titles = await Promise.all(
     .map(async ({ image }, index) => ({
       image,
       alt: `Certificado ${index + 1} de ${contact.owner}`,
-      // Versión grande para el lightbox (WebP, sin pasar del tamaño original).
-      full: await getImage({ src: image, format: "webp", width: Math.min(image.width, 1280) }),
+      // Versión grande para el lightbox (WebP; Astro no agranda si el original es más chico).
+      full: await getImage({ src: image, format: "webp", width: 1280 }),
     })),
 );
 ---
@@ -81,7 +81,8 @@ const titles = await Promise.all(
                 >
                   <Picture
                     src={title.image}
-                    formats={["avif", "webp"]}
+                    formats={["avif"]}
+                    fallbackFormat="webp"
                     widths={[160, 240, 320, 480]}
                     sizes="(min-width: 1024px) 220px, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
                     alt={title.alt}

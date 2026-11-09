@@ -1,25 +1,46 @@
 ---
+import { Image, Picture, getImage } from "astro:assets";
 import bgGalleryImg from "../assets/carrousel/bg-carrousel.png";
 import logoCrest from "../assets/logo2.png";
 import galleryVideo from "../assets/carrousel/carrousel-9.mp4";
+import galleryPosterImg from "../assets/posters/carrousel-9-poster.jpg";
 import img1 from "../assets/carrousel/carrousel-1.jpg";
 import img2 from "../assets/carrousel/carrousel-2.jpg";
-import img3 from "../assets/carrousel/carrousel-3.jpg";
-import img4 from "../assets/carrousel/carrousel-4.jpg";
+import img3 from "../assets/carrousel/carrousel-3.png";
+import img4 from "../assets/carrousel/carrousel-4.webp";
 import img5 from "../assets/carrousel/carrousel-5.jpg";
 import img6 from "../assets/carrousel/carrousel-6.jpg";
-import img7 from "../assets/carrousel/carrousel-7.jpg";
+import img7 from "../assets/carrousel/carrousel-7.png";
 import img8 from "../assets/carrousel/carrousel-8.jpg";
 import WaveDivider from "./WaveDivider.astro";
 import { contact } from "../data/contact";
+import { cssBackground } from "../lib/images";
+
+const photos = {
+  1: { src: img1, alt: "Peluquera armando un recogido a una clienta frente al espejo" },
+  2: { src: img2, alt: "Cabello largo castaño con ondas, visto de espaldas" },
+  3: { src: img3, alt: "Masaje con piedras calientes sobre la espalda" },
+  4: { src: img4, alt: "Esteticista haciendo un tratamiento de aparatología en camilla" },
+  5: { src: img5, alt: "Aplicación de mascarilla facial con pincel" },
+  6: { src: img6, alt: "Interior del salón con sillones y estantería iluminada" },
+  7: { src: img7, alt: "Pedicura spa con pétalos y velas" },
+  8: { src: img8, alt: "Maquillaje profesional: aplicación de labial a una clienta" },
+};
 
 // El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda
 // central (columna 2, fila 2) es el video; las 8 fotos se reparten en el resto en orden.
 const columns = [
-  [img1, img4, img6],
-  [img2, null, img7],
-  [img3, img5, img8],
+  [photos[1], photos[4], photos[6]],
+  [photos[2], null, photos[7]],
+  [photos[3], photos[5], photos[8]],
 ];
+
+// Una celda agrandada ocupa 60cqmin del contenedor cuadrado: 90vw en mobile (→ 54vw) y
+// min(70vmin, 56rem) desde sm (→ hasta ~540px).
+const photoSizes = "(min-width: 640px) min(42vmin, 540px), 54vw";
+
+const bgGallery = await cssBackground(bgGalleryImg);
+const galleryPoster = await getImage({ src: galleryPosterImg, format: "webp", quality: 75 });
 
 const imageClass =
   "absolute inset-0 h-full w-full object-cover saturate-75 brightness-95 transition-all duration-500 " +
@@ -33,7 +54,7 @@ const imageClass =
   <div
     aria-hidden="true"
     class="pointer-events-none absolute inset-0 z-0 min-h-full dark:opacity-20"
-    style={`background-image: url(${bgGalleryImg.src}); background-size: cover; background-position: center; background-repeat: no-repeat;`}
+    style={`${bgGallery.style} background-size: cover; background-position: center; background-repeat: no-repeat;`}
   />
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 min-h-full bg-warmgray-900/45 dark:bg-warmgray-900/75" />
 
@@ -56,25 +77,45 @@ const imageClass =
     <div class="relative mx-auto h-[90vw] w-[90vw] [container-type:inline-size] sm:h-[70vmin] sm:w-[70vmin] sm:max-h-[56rem] sm:max-w-4xl">
       <div data-gallery-grid class="relative h-full w-full">
         {
-          columns.map((column, colIndex) => (
+          columns.map((column) => (
             <div data-col>
-              {column.map((cell, rowIndex) => {
-                const position = colIndex + rowIndex * 3 + 1;
+              {column.map((cell) => {
                 return (
                   <article
                     data-cell
                     tabindex="0"
                     role="button"
-                    aria-label={cell ? `Ver imagen ${position} de la galería en grande` : `Video de ${contact.brand}`}
+                    aria-label={cell ? `Ver en grande: ${cell.alt}` : `Video de ${contact.brand}`}
                     class="group relative cursor-pointer overflow-hidden rounded-xl bg-warmgray-800 outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
                   >
                     {cell ? (
-                      <img src={cell.src} alt="" class={imageClass} />
+                      <Picture
+                        src={cell.src}
+                        formats={["avif"]}
+                        fallbackFormat="webp"
+                        widths={[240, 360, 540, 720, 1080]}
+                        sizes={photoSizes}
+                        alt={cell.alt}
+                        loading="lazy"
+                        class={imageClass}
+                      />
                     ) : (
                       <>
-                        <video class={imageClass} src={galleryVideo} autoplay loop muted playsinline preload="auto" aria-hidden="true" />
+                        {/* Arranca recién cuando la celda entra en pantalla (ver script). Hasta entonces se
+                           ve la portada: el primer frame del propio video. */}
+                        <video
+                          class={imageClass}
+                          src={galleryVideo}
+                          poster={galleryPoster.src}
+                          data-autoplay-visible
+                          loop
+                          muted
+                          playsinline
+                          preload="metadata"
+                          aria-hidden="true"
+                        />
                         <div class="absolute inset-0 flex items-center justify-center bg-warmgray-900/20">
-                          <img src={logoCrest.src} alt="" aria-hidden="true" class="h-1/3 w-1/3 object-contain opacity-80 drop-shadow-lg" />
+                          <Image src={logoCrest} width={180} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-1/3 w-1/3 object-contain opacity-80 drop-shadow-lg" />
                         </div>
                       </>
                     )}
@@ -175,6 +216,21 @@ const imageClass =
       cell.parentElement?.classList.add("is-active");
     }
   }
+
+  // Video de la celda central: se reproduce solo mientras está visible (no descarga ni gasta
+  // batería mientras la galería está fuera de pantalla).
+  const lazyVideos = document.querySelectorAll<HTMLVideoElement>("video[data-autoplay-visible]");
+  const videoObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target as HTMLVideoElement;
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      });
+    },
+    { rootMargin: "200px 0px" },
+  );
+  lazyVideos.forEach((video) => videoObserver.observe(video));
 
   cells.forEach((cell) => {
     cell.addEventListener("click", () => toggleActive(cell));

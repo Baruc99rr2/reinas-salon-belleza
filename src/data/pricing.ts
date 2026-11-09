@@ -1,10 +1,14 @@
 import type { ImageMetadata } from "astro";
-import plan1 from "../assets/plan/plan-1.png";
-import plan2 from "../assets/plan/plan-2.png";
-import plan3 from "../assets/plan/plan-3.png";
-import plan4 from "../assets/plan/plan-4.png";
-import plan5 from "../assets/plan/plan-5.png";
-import plan6 from "../assets/plan/plan-6.png";
+
+// Fondos por convención: src/assets/plan/plan-N.<png|jpg|jpeg|webp|avif>, con N = id del plan.
+// No hace falta importarlos uno por uno: se buscan solos por número.
+const planImageModules = import.meta.glob<{ default: ImageMetadata }>("../assets/plan/plan-*.{png,jpg,jpeg,webp,avif}", {
+  eager: true,
+});
+
+const planImages = new Map<number, ImageMetadata>(
+  Object.entries(planImageModules).map(([path, mod]) => [Number(path.match(/plan-(\d+)\.\w+$/)?.[1]), mod.default]),
+);
 
 export interface PricingPlan {
   id: number;
@@ -19,20 +23,18 @@ export interface PricingPlan {
   description: string[];
   /** Marca el plan como destacado ("Más elegido") */
   featured?: boolean;
-  /** Color (hex) de la flor decorativa 3D de la card, ej: "#f28fb2". Si se omite, usa el rose-muted por defecto. */
+  /** Color (hex) de la flor decorativa de la card, ej: "#f28fb2". Si se omite, usa el rose-muted por defecto. */
   flowerColor?: string;
   /**
    * Imagen de fondo de toda la sección Precios mientras este plan está activo en el carrusel
-   * (Pricing.astro la usa con un cross-fade entre planes). Para agregar un plan nuevo en el
-   * futuro, alcanza con sumar su imagen como plan-N.png en src/assets/plan/, importarla arriba
-   * y pasarla aquí en la entrada correspondiente — es opcional, así que un plan sin imagen
-   * todavía simplemente no cambia el fondo al activarse.
+   * (Pricing.astro la optimiza y hace un cross-fade entre planes). No se completa a mano: sale
+   * sola de src/assets/plan/plan-N.* (N = id). Un plan sin imagen no cambia el fondo al activarse.
    */
   bgImage?: ImageMetadata;
 }
 
 // Datos de ejemplo — reemplazar por los servicios y precios reales del salón.
-export const pricingPlans: PricingPlan[] = [
+const plans: Omit<PricingPlan, "bgImage">[] = [
   {
     id: 1,
     category: "Cortes",
@@ -41,7 +43,6 @@ export const pricingPlans: PricingPlan[] = [
     period: "/sesión",
     description: ["Diagnóstico capilar", "Corte personalizado", "Lavado con productos premium", "Brushing de finalización"],
     flowerColor: "#f28fb2",
-    bgImage: plan1,
   },
   {
     id: 2,
@@ -52,7 +53,6 @@ export const pricingPlans: PricingPlan[] = [
     description: ["Consultoría de color", "Aplicación de tinte o mechas", "Tratamiento post-color", "Brushing incluido"],
     featured: true,
     flowerColor: "#d14d7c",
-    bgImage: plan2,
   },
   {
     id: 3,
@@ -62,7 +62,6 @@ export const pricingPlans: PricingPlan[] = [
     period: "/sesión",
     description: ["Doble limpieza", "Exfoliación e hidratación", "Extracción de comedones", "Mascarilla según tipo de piel"],
     flowerColor: "#c98ba0",
-    bgImage: plan3,
   },
   {
     id: 4,
@@ -72,7 +71,6 @@ export const pricingPlans: PricingPlan[] = [
     period: "/sesión",
     description: ["Manicura clásica o semipermanente", "Pedicura spa con exfoliación", "Hidratación de manos y pies", "Esmaltado a elección"],
     flowerColor: "#e8709a",
-    bgImage: plan4,
   },
   {
     id: 5,
@@ -82,7 +80,6 @@ export const pricingPlans: PricingPlan[] = [
     period: "/sesión",
     description: ["Diagnóstico del cabello", "Ampolla de tratamiento intensivo", "Masaje capilar", "Brushing de finalización"],
     flowerColor: "#a9697f",
-    bgImage: plan5,
   },
   {
     id: 6,
@@ -91,6 +88,7 @@ export const pricingPlans: PricingPlan[] = [
     price: "A consultar",
     description: ["Corte + color", "Tratamiento facial", "Manicura + pedicura", "Sesión completa a medida"],
     flowerColor: "#7d716c",
-    bgImage: plan6,
   },
 ];
+
+export const pricingPlans: PricingPlan[] = plans.map((plan) => ({ ...plan, bgImage: planImages.get(plan.id) }));

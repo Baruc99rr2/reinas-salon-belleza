@@ -1,14 +1,31 @@
 ---
+import { getImage } from "astro:assets";
 import bgVideo from "../assets/bg-hero.mp4";
+import heroPosterImg from "../assets/posters/bg-hero-poster.jpg";
 import WaveDivider from "./WaveDivider.astro";
 import { contact, phoneHref } from "../data/contact";
 
 const { address, phoneDisplay, hours } = contact;
+
+// Portada del video (su primer frame): es lo primero que se ve, así que se precarga con prioridad.
+const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality: 75 });
 ---
 
 <section id="hero" class="relative h-screen w-full overflow-hidden bg-rose-50 dark:bg-warmgray-900">
-  {/* Video de fondo a pantalla completa, con el Navbar fixed y transparente flotando encima. */}
-  <video class="absolute inset-0 h-full w-full object-cover" src={bgVideo} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+  <link rel="preload" as="image" href={heroPoster.src} type="image/webp" fetchpriority="high" />
+  {/* Video de fondo a pantalla completa, con el Navbar fixed y transparente flotando encima.
+     preload="metadata" + poster: mientras el video arranca se ve su primer frame. (Con autoplay el
+     navegador igual lo descarga para reproducirlo; el ahorro está en la galería, ver Gallery.astro). */}
+  <video
+    class="absolute inset-0 h-full w-full object-cover"
+    src={bgVideo}
+    poster={heroPoster.src}
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"></video>
 
   <div
     class="absolute inset-0 bg-gradient-to-b from-warmgray-900/55 via-warmgray-900/30 to-warmgray-900/60 dark:from-warmgray-900/75 dark:via-warmgray-900/50 dark:to-warmgray-900/80"

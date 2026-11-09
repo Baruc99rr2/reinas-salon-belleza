@@ -1,7 +1,14 @@
 ---
-import logoFull from "../assets/logo.png";
-import logoCrest from "../assets/logo2.png";
+import { getImage } from "astro:assets";
+import logoFullSrc from "../assets/logo.png";
+import logoCrestSrc from "../assets/logo2.png";
 import { contact } from "../data/contact";
+
+// Logos al tamaño en que se muestran (como mucho 64px y 48px de alto) + versión 2x para retina.
+// Se usan con <img> común (no <Image>) para que los estilos #logo-full / #logo-crest de abajo
+// les sigan aplicando igual.
+const logoFull = await getImage({ src: logoFullSrc, width: 64, densities: [1, 2], format: "webp" });
+const logoCrest = await getImage({ src: logoCrestSrc, width: 48, densities: [1, 2], format: "webp" });
 
 // "Sobre mí" es una página aparte (/sobre-mi); el resto son anclas de la home, con barra
 // inicial (/#seccion en vez de #seccion) para que funcionen igual estando en /sobre-mi.
@@ -41,16 +48,19 @@ const mobileLinkClass =
       <img
         id="logo-full"
         src={logoFull.src}
-        width={logoFull.width}
-        height={logoFull.height}
+        srcset={logoFull.srcSet.attribute}
+        width={logoFull.attributes.width}
+        height={logoFull.attributes.height}
+        fetchpriority="high"
         alt={`${contact.brand} — ${contact.tagline}`}
         class="h-auto max-h-10 w-auto max-w-[42vw] sm:max-h-14 sm:max-w-[220px] md:max-h-16 md:max-w-none"
       />
       <img
         id="logo-crest"
         src={logoCrest.src}
-        width={logoCrest.width}
-        height={logoCrest.height}
+        srcset={logoCrest.srcSet.attribute}
+        width={logoCrest.attributes.width}
+        height={logoCrest.attributes.height}
         alt={contact.brand}
         class="absolute left-0 h-auto max-h-8 w-auto max-w-[30vw] opacity-0 sm:max-h-10 sm:max-w-[160px] md:max-h-12 md:max-w-none"
       />
