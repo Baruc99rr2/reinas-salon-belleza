@@ -2,33 +2,23 @@
 import { skillCategories } from "../data/skills";
 import logo from "../assets/logo.png";
 
-const address = "Otero 381, Barrio Centro, San Salvador de Jujuy";
-const phoneDisplay = "+54 9 387 7407488";
-const phoneHref = "tel:" + phoneDisplay.replace(/\s+/g, "");
-const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+import { contact, phoneHref, buildWhatsAppUrl } from "../data/contact";
 
+const { address, phoneDisplay, hours, mapEmbedUrl } = contact;
+
+const hoverClasses: Record<string, string> = {
+  Instagram: "hover:text-[#e1306c]",
+  Facebook: "hover:text-[#1877f2]",
+  WhatsApp: "hover:text-[#25d366]",
+  TikTok: "hover:text-[#25f4ee]",
+};
+
+// Solo se muestran las redes que tienen URL cargada en data/contact.ts (nada de href="#").
+// WhatsApp va siempre, armado con el número del salón.
 const socialLinks = [
-  {
-    name: "Instagram",
-    href: "#",
-    hoverClass: "hover:text-[#e1306c]",
-  },
-  {
-    name: "Facebook",
-    href: "#",
-    hoverClass: "hover:text-[#1877f2]",
-  },
-  {
-    name: "WhatsApp",
-    href: "#",
-    hoverClass: "hover:text-[#25d366]",
-  },
-  {
-    name: "TikTok",
-    href: "#",
-    hoverClass: "hover:text-[#25f4ee]",
-  },
-];
+  ...contact.socials.filter((social) => social.url.trim() !== ""),
+  { name: "WhatsApp", url: buildWhatsAppUrl(`Hola ${contact.brand}, quiero hacer una consulta.`) },
+].map((social) => ({ ...social, hoverClass: hoverClasses[social.name] }));
 ---
 
 <footer
@@ -162,7 +152,7 @@ const socialLinks = [
       {/* Columna derecha: mapa + datos de contacto + redes */}
       <div class="flex flex-col gap-8">
         <iframe
-          src={mapSrc}
+          src={mapEmbedUrl}
           class="h-64 w-full rounded-2xl border border-white/10 grayscale transition-all duration-500 hover:grayscale-0 sm:h-72"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
@@ -207,7 +197,7 @@ const socialLinks = [
             </span>
             <div>
               <p class="font-sans text-xs font-semibold tracking-wide text-warmgray-300 uppercase">Horario</p>
-              <p class="mt-0.5 font-sans text-sm text-warmgray-100">Lun a Sáb: 9 a 19 hs</p>
+              <p class="mt-0.5 font-sans text-sm text-warmgray-100">{hours}</p>
             </div>
           </div>
         </div>
@@ -216,8 +206,10 @@ const socialLinks = [
           {
             socialLinks.map((social) => (
               <a
-                href={social.href}
-                aria-label={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${social.name} (se abre en una pestaña nueva)`}
                 class={`flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-warmgray-200 transition-all duration-300 hover:-translate-y-1 hover:border-white/0 ${social.hoverClass}`}
               >
                 {social.name === "Instagram" && (

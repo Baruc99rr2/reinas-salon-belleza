@@ -1,14 +1,11 @@
 ---
 import bgVideo from "../assets/bg-hero.mp4";
 import WaveDivider from "./WaveDivider.astro";
+import { contact, phoneHref } from "../data/contact";
 
 const words = ["brillar", "desconexión", "transformación", "puro cuidado"];
 
-const address = "Otero 381, Barrio Centro, San Salvador de Jujuy";
-const phoneDisplay = "+54 9 387 7407488";
-const phoneHref = "tel:" + phoneDisplay.replace(/\s+/g, "");
-// TODO: horario placeholder — reemplazar por el horario real de atención confirmado.
-const scheduleDisplay = "Lun a Vie: 9 a 18hs";
+const { address, phoneDisplay, hours } = contact;
 ---
 
 <section id="hero" class="relative h-screen w-full overflow-hidden bg-rose-50 dark:bg-warmgray-900">
@@ -34,8 +31,7 @@ const scheduleDisplay = "Lun a Vie: 9 a 18hs";
       </span>
       <div>
         <p class="font-sans text-[10px] font-semibold tracking-wide text-warmgray-500 uppercase dark:text-warmgray-400">Horario</p>
-        {/* TODO: placeholder — reemplazar por el horario real de atención */}
-        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-200">{scheduleDisplay}</p>
+        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-200">{hours}</p>
       </div>
     </div>
 
