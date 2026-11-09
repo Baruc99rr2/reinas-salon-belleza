@@ -1,13 +1,18 @@
 ---
 // Modal de reserva por WhatsApp. Se incluye una sola vez en Layout.astro y lo abre cualquier
-// elemento con el atributo data-booking-trigger (opcional: data-booking-plan="Nombre del plan").
+// elemento con el atributo data-booking-trigger. Con data-booking-service="<id de skills.ts>" el
+// servicio viene preseleccionado (y se puede cambiar):
 //
-//   <button type="button" data-booking-trigger data-booking-plan="Corte + Brushing">Consultar</button>
+//   <button type="button" data-booking-trigger data-booking-service="masajes">Reservar</button>
+//
+// Los servicios del selector salen de skillCategories (data/skills.ts): si se agrega una categoría,
+// aparece sola acá. Fecha y servicio son obligatorios; el mensaje es opcional.
 //
 // Usa <dialog> nativo con showModal(): el resto de la página queda inerte mientras está abierto.
 // Encima de eso el script atrapa el foco con Tab, cierra con Esc / X / click afuera y devuelve
 // el foco al botón que lo abrió. Emite "booking:open" y "booking:close" en document para que
-// otros componentes reaccionen (Pricing pausa su autoplay).
+// otros componentes reaccionen (el carrusel de servicios pausa su autoplay).
+import { skillCategories } from "../data/skills";
 ---
 
 <dialog
@@ -31,19 +36,25 @@
     <p class="pr-10 font-sans text-xs font-semibold tracking-widest text-rose-700 uppercase dark:text-rose-300">Reservas</p>
     <h2 id="booking-title" class="mt-1 pr-10 font-display text-2xl leading-tight sm:text-3xl">Reservá tu turno</h2>
     <p id="booking-description" class="mt-2 font-sans text-sm text-warmgray-700 dark:text-warmgray-100">
-      Elegí el día y te abrimos WhatsApp con el mensaje listo para enviar. El horario lo coordinamos por ahí.
-    </p>
-
-    <p
-      data-booking-plan-wrap
-      hidden
-      class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 font-sans text-sm dark:border-warmgray-700 dark:bg-warmgray-900"
-    >
-      <span class="text-warmgray-700 dark:text-warmgray-100">Servicio elegido:</span>{" "}
-      <strong data-booking-plan-name class="font-semibold text-rose-700 dark:text-rose-300"></strong>
+      Elegí el servicio y el día, y te abrimos WhatsApp con el mensaje listo para enviar. El horario lo coordinamos por ahí.
     </p>
 
     <div class="mt-5">
+      <label for="booking-service" class="mb-1.5 block font-sans text-xs font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">
+        Servicio
+      </label>
+      <select
+        id="booking-service"
+        name="service"
+        required
+        class="w-full min-w-0 cursor-pointer rounded-lg border border-rose-200 bg-white py-2.5 pr-1 pl-2.5 font-sans text-[0.8125rem] text-warmgray-800 min-[300px]:px-3 min-[300px]:text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/40 dark:border-warmgray-700 dark:bg-warmgray-900 dark:text-warmgray-100 dark:[color-scheme:dark]"
+      >
+        <option value="" disabled selected>Elegí un servicio</option>
+        {skillCategories.map((category) => <option value={category.id}>{category.title}</option>)}
+      </select>
+    </div>
+
+    <div class="mt-4">
       <label for="booking-date" class="mb-1.5 block font-sans text-xs font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">
         Fecha del turno
       </label>
@@ -117,27 +128,36 @@
   const messageInput = dialog?.querySelector<HTMLTextAreaElement>("#booking-message");
   const submitBtn = dialog?.querySelector<HTMLButtonElement>("[data-booking-submit]");
   const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-booking-close]");
-  const planWrap = dialog?.querySelector<HTMLElement>("[data-booking-plan-wrap]");
-  const planName = dialog?.querySelector<HTMLElement>("[data-booking-plan-name]");
+  const serviceSelect = dialog?.querySelector<HTMLSelectElement>("#booking-service");
 
-  const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+  const FOCUSABLE =
+    'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
   let opener: HTMLElement | null = null;
-  let currentPlan = "";
+
+  /** Nombre visible del servicio elegido ("" si todavía no eligió). */
+  function selectedServiceName(): string {
+    if (!serviceSelect || serviceSelect.value === "") return "";
+    return serviceSelect.selectedOptions[0]?.textContent?.trim() ?? "";
+  }
+
+  function isComplete(): boolean {
+    return Boolean(dateInput && isValidBookingDate(dateInput.value, dateInput.min) && selectedServiceName());
+  }
 
   function updateSubmitState() {
-    if (!submitBtn || !dateInput) return;
-    submitBtn.disabled = !isValidBookingDate(dateInput.value, dateInput.min);
+    if (submitBtn) submitBtn.disabled = !isComplete();
   }
 
   function openBooking(trigger: HTMLElement) {
     if (!dialog || !dateInput || dialog.open) return;
     opener = trigger;
-    currentPlan = trigger.dataset.bookingPlan?.trim() ?? "";
 
-    if (planWrap && planName) {
-      planName.textContent = currentPlan;
-      planWrap.hidden = currentPlan === "";
+    // Abierto desde una categoría: queda preseleccionada. Sin categoría (ej. el botón del Hero) se
+    // respeta lo que la clienta ya haya elegido antes, si cerró sin enviar.
+    const serviceId = trigger.dataset.bookingService ?? "";
+    if (serviceSelect && serviceId && [...serviceSelect.options].some((option) => option.value === serviceId)) {
+      serviceSelect.value = serviceId;
     }
 
     // El mínimo se recalcula en cada apertura (la página puede quedar abierta de un día para otro).
@@ -147,7 +167,8 @@
 
     dialog.showModal();
     document.body.style.overflow = "hidden";
-    dateInput.focus();
+    // Foco en el primer dato que falta: el servicio si no hay uno elegido; si no, la fecha.
+    (serviceSelect && serviceSelect.value === "" ? serviceSelect : dateInput).focus();
     document.dispatchEvent(new CustomEvent("booking:open"));
   }
 
@@ -201,12 +222,13 @@
 
   dateInput?.addEventListener("input", updateSubmitState);
   dateInput?.addEventListener("change", updateSubmitState);
+  serviceSelect?.addEventListener("change", updateSubmitState);
 
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!dateInput || !isValidBookingDate(dateInput.value, dateInput.min)) return;
+    if (!dateInput || !isComplete()) return;
 
-    const text = buildBookingMessage({ date: dateInput.value, plan: currentPlan, message: messageInput?.value });
+    const text = buildBookingMessage({ date: dateInput.value, service: selectedServiceName(), message: messageInput?.value });
     window.open(buildWhatsAppUrl(text), "_blank", "noopener");
 
     form.reset();

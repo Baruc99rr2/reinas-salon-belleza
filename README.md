@@ -49,9 +49,11 @@ Detalles:
 
 ## Reservas por WhatsApp
 
-- `src/components/BookingModal.astro`: modal de reserva (fecha + mensaje opcional). Se abre con
-  cualquier elemento que tenga `data-booking-trigger`; con `data-booking-plan="Nombre"` muestra y
-  envía el plan elegido. Lo usan el botón del Hero y los "Consultar" de Precios.
+- `src/components/BookingModal.astro`: modal de reserva (servicio y fecha obligatorios, mensaje
+  opcional). Los servicios del selector salen de `skills.ts`. Se abre con cualquier elemento que
+  tenga `data-booking-trigger`; con `data-booking-service="<id de skills.ts>"` el servicio viene
+  preseleccionado. Lo usan el botón del Hero, las tarjetas de "Elegí tu servicio" y el detalle de
+  cada categoría en Servicios.
 - El formulario del Footer valida nombre y mensaje y abre WhatsApp con el texto armado.
 - Los textos de los mensajes se arman en `src/lib/booking.ts`.
 

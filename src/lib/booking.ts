@@ -51,16 +51,16 @@ interface BookingMessageInput {
   date: string;
   /** Fecha de referencia para decidir si se muestra el año (por defecto, hoy). */
   now?: Date;
-  /** Nombre del plan, si el modal se abrió desde Precios. */
-  plan?: string;
+  /** Categoría de servicio elegida (obligatoria), ej. "Masajes". */
+  service: string;
   /** Mensaje opcional de la clienta. */
   message?: string;
 }
 
 /** Mensaje del modal de reserva. */
-export function buildBookingMessage({ date, plan, message, now }: BookingMessageInput): string {
+export function buildBookingMessage({ date, service, message, now }: BookingMessageInput): string {
   let text = `Quiero sacar un turno para esta fecha: ${formatDateEs(date, now)}`;
-  if (plan?.trim()) text += `\nServicio: ${plan.trim()}`;
+  text += `\nServicio: ${service.trim()}`;
   if (message?.trim()) text += `\n\n${message.trim()}`;
   return text;
 }
