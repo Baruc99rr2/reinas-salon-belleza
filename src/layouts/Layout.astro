@@ -21,7 +21,12 @@ const {
     <meta charset="UTF-8" />
     <script is:inline>
       (function () {
-        var stored = localStorage.getItem("theme");
+        // localStorage puede tirar error (navegación privada, cookies bloqueadas): en ese caso se
+        // sigue sin preferencia guardada y manda la del sistema.
+        var stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
         var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (stored === "dark" || (!stored && prefersDark)) {
           document.documentElement.classList.add("dark");

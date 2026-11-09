@@ -37,7 +37,7 @@ import { contact } from "../data/contact";
     </section>
   </main>
 
-  {/* Lightbox: grilla con las 30 imágenes completas (mismo patrón de overlay que el modal de
+  {/* Lightbox: grilla con todos los títulos (titulo-*.jpg; mismo patrón de overlay que el modal de
      MySkills — fixed, centrado, con blur de fondo y botón de cerrar). */}
   <div
     id="lightbox"
@@ -393,8 +393,8 @@ import { contact } from "../data/contact";
 <script>
   import { contact } from "../data/contact";
 
-  // --- Lightbox (paso 8): grilla con las 30 imágenes completas, cargadas con import.meta.glob
-  // en vez de 30 imports a mano — se ordenan por el número en el nombre de archivo porque las
+  // --- Lightbox (paso 8): grilla con todos los titulo-*.jpg, cargados con import.meta.glob
+  // en vez de un import a mano por archivo — se ordenan por el número en el nombre de archivo porque las
   // claves del glob no vienen garantizadas en orden numérico (titulo-10 antes que titulo-2, por
   // orden alfabético). ---
   const modules = import.meta.glob<{ default: { src: string } }>("../assets/studies/titulo-*.jpg", { eager: true });
@@ -441,7 +441,7 @@ import { contact } from "../data/contact";
   });
 
   // --- Paso 4: visor grande con prev/next, se abre encima de la grilla al tocar una miniatura.
-  // Da la vuelta completa (de la 30 a la 1 y viceversa) con el mismo módulo `%` que ya usa el
+  // Da la vuelta completa (de la última a la primera y viceversa) con el mismo módulo `%` que ya usa el
   // carrusel de Pricing para su wrap-around. ---
   const viewer = document.getElementById("lightbox-viewer");
   const viewerImage = document.getElementById("viewer-image") as HTMLImageElement;

@@ -4,6 +4,7 @@ import plan2 from "../assets/plan/plan-2.png";
 import plan3 from "../assets/plan/plan-3.png";
 import plan4 from "../assets/plan/plan-4.png";
 import plan5 from "../assets/plan/plan-5.png";
+import plan6 from "../assets/plan/plan-6.png";
 
 export interface PricingPlan {
   id: number;
@@ -90,6 +91,6 @@ export const pricingPlans: PricingPlan[] = [
     price: "A consultar",
     description: ["Corte + color", "Tratamiento facial", "Manicura + pedicura", "Sesión completa a medida"],
     flowerColor: "#7d716c",
-    // TODO: falta plan-6.png en src/assets/plan/ — sumarla y agregar bgImage acá.
+    bgImage: plan6,
   },
 ];
