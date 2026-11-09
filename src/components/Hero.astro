@@ -45,8 +45,8 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
         </svg>
       </span>
       <div>
-        <p class="font-sans text-[10px] font-semibold tracking-wide text-warmgray-500 uppercase dark:text-warmgray-400">Atención</p>
-        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-200">{hours}</p>
+        <p class="font-sans text-[11px] font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">Atención</p>
+        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-100">{hours}</p>
       </div>
     </div>
 
@@ -58,8 +58,8 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
         </svg>
       </span>
       <div>
-        <p class="font-sans text-[10px] font-semibold tracking-wide text-warmgray-500 uppercase dark:text-warmgray-400">Dirección</p>
-        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-200">{address}</p>
+        <p class="font-sans text-[11px] font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">Dirección</p>
+        <p class="mt-0.5 font-sans text-xs text-warmgray-700 dark:text-warmgray-100">{address}</p>
       </div>
     </div>
 
@@ -70,8 +70,8 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
         </svg>
       </span>
       <div>
-        <p class="font-sans text-[10px] font-semibold tracking-wide text-warmgray-500 uppercase dark:text-warmgray-400">Teléfono</p>
-        <a href={phoneHref} class="mt-0.5 block font-sans text-xs text-warmgray-700 transition-colors hover:text-rose-500 dark:text-warmgray-200 dark:hover:text-rose-muted">
+        <p class="font-sans text-[11px] font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">Teléfono</p>
+        <a href={phoneHref} class="mt-0.5 block font-sans text-xs text-warmgray-700 transition-colors hover:text-rose-500 dark:text-warmgray-100 dark:hover:text-rose-muted">
           {phoneDisplay}
         </a>
       </div>
@@ -83,18 +83,18 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
     <div data-tilt-card class="almanac-card almanac-tilt relative w-36 rounded-2xl border border-rose-200 bg-white/90 px-3 pt-4 pb-3 text-center shadow-[-14px_10px_28px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:w-40 dark:border-warmgray-700 dark:bg-warmgray-800/90">
       <span aria-hidden="true" class="absolute -top-2.5 left-1/2 h-3 w-9 -translate-x-1/2 rounded-full bg-rose-300 shadow-sm dark:bg-rose-muted-strong"></span>
 
-      <p class="font-sans text-[10px] font-semibold tracking-[0.2em] text-warmgray-500 uppercase dark:text-warmgray-400" data-almanac-year></p>
-      <p class="mt-0.5 font-display text-sm text-warmgray-700 dark:text-warmgray-200" data-almanac-month></p>
+      <p class="font-sans text-[11px] font-semibold tracking-[0.2em] text-warmgray-700 uppercase dark:text-warmgray-100" data-almanac-year></p>
+      <p class="mt-0.5 font-display text-sm text-warmgray-700 dark:text-warmgray-100" data-almanac-month></p>
       <p class="almanac-glow mt-0.5 font-display text-4xl leading-none text-rose-500 sm:text-5xl dark:text-rose-muted" data-almanac-day></p>
 
       <div class="mt-3 hidden sm:block">
-        <div class="grid grid-cols-7 gap-y-1 font-sans text-[8px] font-semibold text-warmgray-400 uppercase dark:text-warmgray-500" data-almanac-weekdays></div>
-        <div class="mt-1 grid grid-cols-7 gap-y-1 font-sans text-[9px] text-warmgray-700 dark:text-warmgray-200" data-almanac-grid></div>
+        <div class="grid grid-cols-7 gap-y-1 font-sans text-[11px] font-semibold text-warmgray-700 uppercase dark:text-warmgray-100" data-almanac-weekdays></div>
+        <div class="mt-1 grid grid-cols-7 gap-y-1 font-sans text-[11px] text-warmgray-700 dark:text-warmgray-100" data-almanac-grid></div>
       </div>
     </div>
 
     <div data-tilt-card class="almanac-card almanac-tilt w-36 rounded-2xl border border-rose-200 bg-white/90 px-3 py-2.5 text-center shadow-[-10px_8px_20px_rgba(0,0,0,0.16)] backdrop-blur-sm sm:w-40 dark:border-warmgray-700 dark:bg-warmgray-800/90">
-      <p class="font-sans text-[9px] font-semibold tracking-[0.2em] text-warmgray-500 uppercase dark:text-warmgray-400">Hora actual</p>
+      <p class="font-sans text-[11px] font-semibold tracking-[0.2em] text-warmgray-700 uppercase dark:text-warmgray-100">Hora actual</p>
       <p class="almanac-glow mt-0.5 font-sans text-xl font-semibold tabular-nums text-rose-500 sm:text-2xl dark:text-rose-muted" data-almanac-clock></p>
     </div>
   </div>
@@ -123,7 +123,7 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
     {/* Versión compacta de almanaque + contacto para mobile: en pantallas angostas los
        widgets de esquina (arriba) se ocultan y esta franja resume lo mismo en una línea,
        debajo del título, sin robarle espacio vertical al botón CTA. */}
-    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 rounded-full bg-white/15 px-4 py-2 font-sans text-[11px] text-white backdrop-blur-sm sm:hidden">
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 rounded-full bg-white/15 px-4 py-2 font-sans text-xs text-white backdrop-blur-sm sm:hidden">
       <span class="flex items-center gap-1.5">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5 text-rose-300">
           <rect x="3" y="4" width="18" height="17" rx="2" />
@@ -152,7 +152,7 @@ const heroPoster = await getImage({ src: heroPosterImg, format: "webp", quality:
       type="button"
       data-booking-trigger
       aria-haspopup="dialog"
-      class="group mt-6 inline-flex cursor-pointer items-center gap-3 rounded-full bg-white/90 pl-6 pr-1.5 py-1.5 font-sans text-sm font-semibold text-rose-600 shadow-lg backdrop-blur-sm transition-colors hover:bg-white sm:mt-8 sm:pl-7 sm:text-base dark:bg-warmgray-800/90 dark:text-rose-muted dark:hover:bg-warmgray-800"
+      class="group mt-6 inline-flex cursor-pointer items-center gap-3 rounded-full bg-white/90 pl-6 pr-1.5 py-1.5 font-sans text-sm font-semibold text-rose-600 shadow-lg backdrop-blur-sm transition-colors hover:bg-white sm:mt-8 sm:pl-7 sm:text-base dark:bg-warmgray-800/90 dark:text-rose-200 dark:hover:bg-warmgray-800"
     >
       Reservá tu turno
       <span
