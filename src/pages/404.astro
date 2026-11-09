@@ -1,0 +1,52 @@
+---
+// Página 404: se muestra para cualquier dirección que no existe (Vercel sirve dist/404.html).
+// No se indexa ni entra al sitemap.
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import crown from "../assets/logo2.png";
+import { contact } from "../data/contact";
+---
+
+<Layout
+  title={`Página no encontrada · ${contact.brand}`}
+  description={`La página que buscás no existe. Volvé al inicio de ${contact.brand} o reservá tu turno.`}
+  noindex
+>
+  <Navbar solid />
+
+  <main
+    class="relative flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200 px-4 pt-28 pb-16 text-center sm:px-6 dark:from-warmgray-900 dark:via-warmgray-800 dark:to-black"
+  >
+    <div aria-hidden="true" class="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-rose-300/40 blur-3xl dark:bg-rose-muted/20"></div>
+    <div aria-hidden="true" class="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-rose-400/30 blur-3xl dark:bg-rose-muted-strong/15"></div>
+
+    <div class="relative z-10 mx-auto max-w-lg">
+      <Image src={crown} width={128} densities={[1, 2]} alt="" aria-hidden="true" loading="eager" class="mx-auto h-auto w-24 sm:w-32" />
+
+      <p class="mt-4 font-sans text-xs font-semibold tracking-[0.25em] text-rose-700 uppercase dark:text-rose-300">Error 404</p>
+      <h1 class="mt-2 font-display text-3xl leading-tight text-warmgray-800 sm:text-5xl dark:text-warmgray-100">
+        No encontramos esta página
+      </h1>
+      <p class="mx-auto mt-4 max-w-md font-sans leading-relaxed text-warmgray-700 dark:text-warmgray-100">
+        Puede que el link haya cambiado o que la página ya no exista. Te esperamos en el inicio o, si querés, reservá tu turno
+        directamente.
+      </p>
+
+      <div class="mt-8 flex flex-col items-stretch justify-center gap-3 min-[400px]:flex-row min-[400px]:items-center">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center rounded-full bg-rose-700 px-6 py-3 font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-warmgray-900"
+        >
+          Volver al inicio
+        </a>
+        <a
+          href="/#reservar"
+          class="inline-flex items-center justify-center rounded-full border border-rose-700 bg-white/70 px-6 py-3 font-sans text-sm font-semibold text-rose-700 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-rose-300 dark:bg-transparent dark:text-rose-200 dark:hover:bg-white/10 dark:focus-visible:ring-offset-warmgray-900"
+        >
+          Reservar un turno
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>

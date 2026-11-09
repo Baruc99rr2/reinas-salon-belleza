@@ -4,6 +4,14 @@ import logoFullSrc from "../assets/logo.png";
 import logoCrestSrc from "../assets/logo2.png";
 import { contact } from "../data/contact";
 
+interface Props {
+  /** Fondo desde el principio (no solo al hacer scroll): para páginas que no arrancan sobre una
+   * foto o un fondo oscuro, como la 404. */
+  solid?: boolean;
+}
+
+const { solid = false } = Astro.props;
+
 // Logos al tamaño en que se muestran (como mucho 64px y 48px de alto) + versión 2x para retina.
 // Se usan con <img> común (no <Image>) para que los estilos #logo-full / #logo-crest de abajo
 // les sigan aplicando igual.
@@ -38,6 +46,7 @@ const mobileLinkClass =
 
 <header
   id="site-header"
+  data-solid={solid ? "" : undefined}
   class="fixed inset-x-0 top-0 z-50 bg-white/10 shadow-sm backdrop-blur-sm dark:bg-warmgray-900/10"
 >
   <nav class="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4">
@@ -274,7 +283,7 @@ const mobileLinkClass =
   let scrollTicking = false;
 
   function updateScrolledState() {
-    const shouldBeScrolled = window.scrollY > SCROLL_THRESHOLD;
+    const shouldBeScrolled = window.scrollY > SCROLL_THRESHOLD || header?.dataset.solid !== undefined;
     if (shouldBeScrolled !== isScrolled) {
       isScrolled = shouldBeScrolled;
       header?.classList.toggle("is-scrolled", isScrolled);
