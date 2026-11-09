@@ -1,36 +1,63 @@
 ---
-import { pricingPlans } from "../data/pricing";
-import WaveDivider from "./WaveDivider.astro";
-import PricingFlower from "./PricingFlower.astro";
+// "Elegí tu servicio": carrusel con las categorías del catálogo (data/skills.ts). Cada tarjeta abre
+// el modal de reserva con su categoría preseleccionada. Por ahora no se publican precios.
+//
+// Fondo de la sección: una foto real del salón por categoría (cross-fade al cambiar de tarjeta) y una
+// flor decorativa de color propio. Ambos se asignan por id acá abajo; una categoría nueva sin entrada
+// en estos mapas usa el fondo de la cabina y el color por defecto.
+import type { ImageMetadata } from "astro";
 import { getImage } from "astro:assets";
+import { skillCategories } from "../data/skills";
+import WaveDivider from "./WaveDivider.astro";
+import ServiceFlower from "./ServiceFlower.astro";
+import fotoEquipo from "../assets/about/photo_2026-11-02_05-19-11.jpg";
+import fotoCabina from "../assets/about/imagen1.jpg";
+import fotoCabinaLuzTenue from "../assets/about/photo_2026-10-30_19-03-58.jpg";
+import fotoTocador from "../assets/about/photo_2026-11-02_05-19-10 (2).jpg";
 
-// Fondos optimizados (WebP, 1920px o el tamaño original si es menor) de cada plan, en el mismo orden que pricingPlans. El
-// script los lee de data-bg-urls para el cross-fade; "" = plan sin imagen (no cambia el fondo).
+// No hay fotos de masajes ni de depilación: esas dos usan fotos generales de la cabina.
+const backgrounds: Record<string, ImageMetadata> = {
+  "faciales-corporales": fotoEquipo,
+  depilacion: fotoCabina,
+  masajes: fotoCabinaLuzTenue,
+  "pestanas-cejas": fotoTocador,
+};
+
+const flowerColors: Record<string, string> = {
+  "faciales-corporales": "#f28fb2",
+  depilacion: "#d14d7c",
+  masajes: "#a9697f",
+  "pestanas-cejas": "#e8709a",
+};
+
+// Fondos optimizados (WebP, 1920px o el tamaño original si es menor), en el orden de skillCategories.
+// El script los lee de data-bg-urls para el cross-fade.
 const bgUrls = await Promise.all(
-  pricingPlans.map(async (plan) =>
-    plan.bgImage ? (await getImage({ src: plan.bgImage, format: "webp", width: 1920, quality: 72 })).src : "",
-  ),
+  skillCategories.map(async (category) => {
+    const src = backgrounds[category.id] ?? fotoCabina;
+    return (await getImage({ src, format: "webp", width: 1920, quality: 72 })).src;
+  }),
 );
-const firstBg = bgUrls.find((url) => url !== "") ?? "";
+const firstBg = bgUrls[0] ?? "";
 ---
 
-<section id="pricing" data-bg-urls={JSON.stringify(bgUrls)} class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
-  {/* Fondo de la sección: la imagen del plan activo, en dos capas <img> superpuestas para el
-     cross-fade (ver script + .pricing-bg-layer más abajo) — nunca se corta de golpe, siempre
+<section id="reservar" data-bg-urls={JSON.stringify(bgUrls)} class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
+  {/* Fondo de la sección: la foto de la categoría activa, en dos capas <img> superpuestas para el
+     cross-fade (ver script + .service-bg-layer más abajo) — nunca se corta de golpe, siempre
      hay una entrando en opacity mientras la otra sale. Mismo overlay que en MySkills/Gallery
      para que el texto siga siendo legible encima en los dos temas. */}
   <div class="absolute inset-0 z-0" aria-hidden="true">
-    <img data-pricing-bg src={firstBg} alt="" loading="lazy" decoding="async" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-100" />
-    <img data-pricing-bg src={firstBg} alt="" loading="lazy" decoding="async" class="pricing-bg-layer absolute inset-0 h-full w-full object-cover opacity-0" />
+    <img data-service-bg src={firstBg} alt="" loading="lazy" decoding="async" class="service-bg-layer absolute inset-0 h-full w-full object-cover opacity-100" />
+    <img data-service-bg src={firstBg} alt="" loading="lazy" decoding="async" class="service-bg-layer absolute inset-0 h-full w-full object-cover opacity-0" />
   </div>
   <div class="absolute inset-0 z-0 bg-warmgray-900/45 dark:bg-warmgray-900/75" aria-hidden="true" />
 
   <div class="relative z-10 mx-auto max-w-6xl">
     <div class="mb-12 text-center md:mb-16">
-      <p class="font-sans text-xs font-semibold tracking-widest text-rose-500 uppercase dark:text-rose-muted">Precios</p>
-      <h2 class="mt-2 font-display text-3xl text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)] md:text-5xl">Nuestros planes</h2>
+      <p class="font-sans text-xs font-semibold tracking-widest text-rose-200 uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">Reservá tu turno</p>
+      <h2 class="mt-2 font-display text-3xl text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)] md:text-5xl">Elegí tu servicio</h2>
       <p class="mx-auto mt-3 max-w-xl font-sans text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
-        Elegí el servicio que mejor se adapte a tu momento. Precios de referencia, consultanos por combinaciones a medida.
+        Elegí qué querés hacerte y reservá el día. El horario lo coordinamos por WhatsApp.
       </p>
     </div>
 
@@ -39,76 +66,37 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
        interprete el gesto como algo ambiguo (el mismo tipo de problema que ya causó overflow
        horizontal en otra sección de esta página). */}
     <div class="relative overflow-x-hidden [touch-action:pan-y]" data-carousel>
-      <div class="relative h-[540px] overflow-hidden sm:h-[500px] md:[perspective:1400px]" data-stage>
+      <div class="relative h-[380px] overflow-hidden sm:h-[360px] md:[perspective:1400px]" data-stage>
         <div class="absolute inset-0 md:[transform-style:preserve-3d]" data-track>
           {
-            pricingPlans.map((plan, i) => (
+            skillCategories.map((category, i) => (
               <article
                 data-card
                 data-index={i}
-                class:list={[
-                  "pricing-card absolute top-1/2 left-1/2 flex w-[min(72vw,20rem)] flex-col rounded-2xl border bg-warmgray-900/55 p-4 text-left shadow-lg backdrop-blur-sm sm:w-[min(80vw,20rem)] sm:p-6 dark:bg-warmgray-900/70",
-                  plan.featured
-                    ? "border-rose-300 ring-2 ring-rose-200 dark:border-rose-muted dark:ring-rose-muted/25"
-                    : "border-rose-100 dark:border-warmgray-700",
-                ]}
+                aria-roledescription="tarjeta"
+                class="service-card absolute top-1/2 left-1/2 flex w-[min(72vw,20rem)] flex-col rounded-2xl border border-rose-100 bg-warmgray-900/55 p-4 text-left shadow-lg backdrop-blur-sm sm:w-[min(80vw,20rem)] sm:p-6 dark:border-warmgray-700 dark:bg-warmgray-900/70"
               >
-                {plan.featured && (
-                  <span class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-rose-700 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white shadow">
-                    Más elegido
-                  </span>
-                )}
-
-                <PricingFlower
-                  color={plan.flowerColor ?? "#c98ba0"}
-                  uid={`pricing-flower-${plan.id}`}
+                <ServiceFlower
+                  color={flowerColors[category.id] ?? "#c98ba0"}
+                  uid={`service-flower-${category.id}`}
                   index={i}
                   class="pointer-events-none absolute top-1.5 right-1.5 z-0 h-14 w-14 opacity-60 sm:top-2 sm:right-2 sm:h-20 sm:w-20"
                 />
 
                 <div class="relative z-10 flex flex-1 flex-col text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
-                  <p class="font-sans text-xs font-semibold tracking-wide text-white uppercase">
-                    {plan.category}
-                  </p>
-                  <h3 class="mt-1 font-display text-[clamp(1.125rem,5.5vw,1.5rem)] text-white">
-                    {plan.title}
-                  </h3>
-
-                  <p class="mt-4 flex items-baseline gap-1">
-                    <span class="font-display text-[clamp(1.375rem,7vw,1.875rem)] text-white">
-                      {plan.price === "A consultar" ? plan.price : `$${plan.price}`}
-                    </span>
-                    {plan.period && <span class="font-sans text-sm text-white">{plan.period}</span>}
-                  </p>
-
-                  <ul class="mt-5 flex-1 space-y-2 font-sans text-sm text-white">
-                    {plan.description.map((item) => (
-                      <li class="flex items-start gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          class="mt-0.5 h-4 w-4 shrink-0 text-rose-400 dark:text-rose-muted"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p class="font-sans text-xs font-semibold tracking-wide text-white uppercase">Servicio</p>
+                  <h3 class="mt-1 pr-14 font-display text-[clamp(1.25rem,6vw,1.75rem)] leading-tight text-white sm:pr-16">{category.title}</h3>
+                  <p class="mt-4 flex-1 font-sans text-sm leading-relaxed text-white">{category.description}</p>
 
                   <button
                     type="button"
                     data-booking-trigger
+                    data-booking-service={category.id}
                     aria-haspopup="dialog"
-                    aria-label={`Consultar por ${plan.title}`}
+                    aria-label={`Reservar este servicio: ${category.title}`}
                     class="mt-6 w-full cursor-pointer rounded-full bg-rose-700 px-4 py-2.5 font-sans text-sm font-semibold text-white transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:outline-none"
                   >
-                    Consultar
+                    Reservar este servicio
                   </button>
                 </div>
               </article>
@@ -120,7 +108,7 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
       <button
         type="button"
         data-prev
-        aria-label="Plan anterior"
+        aria-label="Servicio anterior"
         class="absolute top-1/2 left-0 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-500 shadow-md transition-colors hover:bg-rose-50 sm:left-2 sm:h-10 sm:w-10 md:left-0 dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-rose-muted dark:hover:bg-warmgray-700"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 sm:h-5 sm:w-5">
@@ -131,7 +119,7 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
       <button
         type="button"
         data-next
-        aria-label="Plan siguiente"
+        aria-label="Servicio siguiente"
         class="absolute top-1/2 right-0 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-500 shadow-md transition-colors hover:bg-rose-50 sm:right-2 sm:h-10 sm:w-10 md:right-0 dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-rose-muted dark:hover:bg-warmgray-700"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 sm:h-5 sm:w-5">
@@ -141,11 +129,11 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
 
       <div class="mt-6 flex justify-center gap-2" data-dots>
         {
-          pricingPlans.map((_, i) => (
+          skillCategories.map((category, i) => (
             <button
               type="button"
               data-dot={i}
-              aria-label={`Ir al plan ${i + 1}`}
+              aria-label={`Ver ${category.title}`}
               class="h-2 w-2 rounded-full bg-rose-200 transition-all duration-300 dark:bg-warmgray-700"
             />
           ))
@@ -156,7 +144,7 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
 
   {/* Desemboca en Volver al Origen: acuarela y hoja hacia el crema (claro) / la noche (oscuro). */}
   <WaveDivider
-    id="pricing-origen"
+    id="reservar-origen"
     color1="#F7B2CB"
     color2="#F6B9AD"
     color3="#C9D3AE"
@@ -169,14 +157,14 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
 </section>
 
 <style>
-  /* Duración pensada para calzar con .pricing-card (1000ms) sin quedar más lenta que el resto
+  /* Duración pensada para calzar con .service-card (1000ms) sin quedar más lenta que el resto
      del carrusel; BG_TRANSITION_MS en el script usa el mismo valor para el "lock" de navegación. */
-  .pricing-bg-layer {
+  .service-bg-layer {
     transition: opacity 900ms ease-in-out;
     will-change: opacity;
   }
 
-  .pricing-card {
+  .service-card {
     --offset: 0;
     --dist: 0;
     transform: translate(-50%, -50%) translateX(calc(var(--offset) * 190px)) scale(calc(1 - var(--dist) * 0.12));
@@ -189,17 +177,17 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
   }
 
   @media (min-width: 768px) {
-    .pricing-card {
+    .service-card {
       transform: translate(-50%, -50%) translateX(calc(var(--offset) * 230px)) translateZ(calc(var(--dist) * -160px)) rotateY(
             calc(var(--offset) * -30deg)
           ) scale(calc(1 - var(--dist) * 0.1));
     }
   }
 
-  /* Con "reducir movimiento" los cambios de plan son instantáneos (sin deslizamiento ni fundido). */
+  /* Con "reducir movimiento" los cambios de tarjeta son instantáneos (sin deslizamiento ni fundido). */
   @media (prefers-reduced-motion: reduce) {
-    .pricing-card,
-    .pricing-bg-layer {
+    .service-card,
+    .service-bg-layer {
       transition: none;
     }
   }
@@ -221,15 +209,15 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
   const dots = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-dot]"));
   const prevBtn = document.querySelector<HTMLButtonElement>("[data-prev]");
   const nextBtn = document.querySelector<HTMLButtonElement>("[data-next]");
-  const bgLayers = Array.from(document.querySelectorAll<HTMLImageElement>("[data-pricing-bg]"));
-  const bgUrls: string[] = JSON.parse(document.querySelector<HTMLElement>("#pricing")?.dataset.bgUrls ?? "[]");
+  const bgLayers = Array.from(document.querySelectorAll<HTMLImageElement>("[data-service-bg]"));
+  const bgUrls: string[] = JSON.parse(document.querySelector<HTMLElement>("#reservar")?.dataset.bgUrls ?? "[]");
   const total = cards.length;
 
   const AUTOPLAY_MS = 4500;
   const SWIPE_THRESHOLD = 50;
-  // Debe coincidir con la transition-duration de .pricing-bg-layer en el <style> de arriba:
+  // Debe coincidir con la transition-duration de .service-bg-layer en el <style> de arriba:
   // es cuánto tarda el cross-fade del fondo, y también cuánto dura el "lock" de navegación
-  // (ver isTransitioning) para que nunca se pueda arrancar un segundo cambio de plan a mitad
+  // (ver isTransitioning) para que nunca se pueda arrancar un segundo cambio de tarjeta a mitad
   // del fundido anterior — ni haciendo swipe varias veces seguidas muy rápido.
   const BG_TRANSITION_MS = 900;
 
@@ -240,12 +228,12 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
   // El autoplay corre solo si no hay ningún motivo de pausa activo: mouse encima, foco adentro,
   // modal de reserva abierto o "reducir movimiento" en el sistema. Con un Set, cada motivo se
   // agrega/quita por separado y uno no pisa al otro (ej.: al cerrar el modal el foco vuelve a
-  // "Consultar", así que la pausa por foco sigue vigente aunque se haya ido la del modal).
+  // "Reservar este servicio", así que la pausa por foco sigue vigente aunque se haya ido la del modal).
   const pauseReasons = new Set<string>();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   // Dos capas <img> superpuestas, alternando cuál está "arriba" (opacity 1): la de atrás
-  // recibe el src del plan nuevo y sube a opacity 1 mientras la de adelante baja a 0, al mismo
+  // recibe el src de la categoría nueva y sube a opacity 1 mientras la de adelante baja a 0, al mismo
   // tiempo — ese solapamiento es lo que se ve como cross-fade en vez de un corte.
   let frontBgIndex = 0;
 
@@ -282,8 +270,8 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
   }
 
   // Todas las formas de navegar (flechas, dots, swipe, autoplay) pasan por acá: mientras
-  // isTransitioning esté activo, un plan nuevo simplemente no se acepta — así, aunque el
-  // usuario deslice el dedo varias veces seguidas muy rápido, el carrusel avanza de un plan
+  // isTransitioning esté activo, un cambio nuevo simplemente no se acepta — así, aunque el
+  // usuario deslice el dedo varias veces seguidas muy rápido, el carrusel avanza de una tarjeta
   // por vez en vez de saltar varios o descontrolarse.
   function goTo(index: number) {
     if (isTransitioning) return;
@@ -376,7 +364,7 @@ const firstBg = bgUrls.find((url) => url !== "") ?? "";
   });
 
   // Mientras el modal de reserva está abierto el carrusel no avanza: así la card desde la que se
-  // abrió sigue siendo la activa. Al cerrar, el foco vuelve a su "Consultar": si quedó adentro del
+  // abrió sigue siendo la activa. Al cerrar, el foco vuelve a su "Reservar este servicio": si quedó adentro del
   // carrusel, la pausa pasa a ser por foco hasta que salga.
   document.addEventListener("booking:open", () => setPaused("modal", true));
   document.addEventListener("booking:close", () => {

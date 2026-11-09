@@ -1,8 +1,8 @@
 ---
-// Flor decorativa de las cards de Precios: SVG inline (sin WebGL). El volumen sale de los
+// Flor decorativa de las tarjetas de "Elegí tu servicio": SVG inline (sin WebGL). El volumen sale de los
 // degradados de cada pétalo (oscuro en el centro → color → claro en la punta), dos coronas de
 // pétalos a distinta altura, un centro con brillo y una sombra suave. El color viene de
-// `flowerColor` en data/pricing.ts.
+// mapa de colores por categoría en ServicePicker.astro.
 //
 // La animación ("respiración": flota, crece apenas y gira lento) solo corre en desktop y si el
 // sistema no pide reducir movimiento; en mobile queda estática, como antes.
@@ -45,7 +45,7 @@ const ids = { front: `${uid}-front`, back: `${uid}-back`, center: `${uid}-center
   viewBox="-50 -50 100 100"
   aria-hidden="true"
   focusable="false"
-  class:list={["pricing-flower", className]}
+  class:list={["service-flower", className]}
   style={`--flower-delay: ${-index * 0.9}s`}
 >
   <defs>
@@ -67,7 +67,7 @@ const ids = { front: `${uid}-front`, back: `${uid}-back`, center: `${uid}-center
     </radialGradient>
   </defs>
 
-  <g class="pricing-flower-spin">
+  <g class="service-flower-spin">
     <g transform={`rotate(${index * 17})`}>
       {/* Corona de atrás: más grande, más oscura y corrida 30° → da profundidad. */}
       {angles.map((angle) => <path d={petal} transform={`rotate(${angle + 30}) scale(1.12)`} fill={`url(#${ids.back})`}></path>)}
@@ -89,19 +89,19 @@ const ids = { front: `${uid}-front`, back: `${uid}-back`, center: `${uid}-center
 </svg>
 
 <style>
-  .pricing-flower {
+  .service-flower {
     overflow: visible;
     filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
   }
 
   /* En SVG el transform-origin por defecto es el (0,0) del viewBox, que acá es el centro de la flor. */
   @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-    .pricing-flower {
+    .service-flower {
       animation: flower-breathe 5.5s ease-in-out infinite;
       animation-delay: var(--flower-delay, 0s);
     }
 
-    .pricing-flower-spin {
+    .service-flower-spin {
       animation: flower-spin 40s linear infinite;
       animation-delay: var(--flower-delay, 0s);
     }

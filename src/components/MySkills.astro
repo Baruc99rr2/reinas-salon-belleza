@@ -191,6 +191,17 @@ const categoryImages = await Promise.all(
               <p class="font-sans text-xs font-semibold tracking-widest text-rose-500 uppercase dark:text-rose-muted">Servicios</p>
               <h3 class="mt-1 font-display text-2xl text-warmgray-800 sm:text-3xl dark:text-warmgray-100" data-back-title></h3>
               <ul class="mt-5 w-full space-y-2.5 font-sans text-sm text-warmgray-600 sm:text-base dark:text-warmgray-400" data-back-services></ul>
+              {/* Abre el modal de reserva con esta categoría preseleccionada (el script le pone el id). */}
+              <button
+                type="button"
+                data-booking-trigger
+                data-booking-service=""
+                data-back-reserve
+                aria-haspopup="dialog"
+                class="mt-5 w-full max-w-60 shrink-0 cursor-pointer rounded-full bg-rose-700 px-4 py-2.5 font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-warmgray-800"
+              >
+                Reservar
+              </button>
             </div>
           </div>
 
@@ -211,7 +222,7 @@ const categoryImages = await Promise.all(
   </div>
 
   <WaveDivider
-    id="skills-pricing"
+    id="skills-reservar"
     color1="#F7B2CB"
     color2="#F28FB2"
     color3="#FBD3E0"
@@ -403,6 +414,7 @@ const categoryImages = await Promise.all(
   const backTitle = document.querySelector<HTMLElement>("[data-back-title]");
   const backImage = document.querySelector<HTMLImageElement>("[data-category-image] img");
   const backServices = document.querySelector<HTMLElement>("[data-back-services]");
+  const backReserve = document.querySelector<HTMLButtonElement>("[data-back-reserve]");
   const labelRight = document.querySelector<HTMLElement>("[data-label-right]");
   const labelLeft = document.querySelector<HTMLElement>("[data-label-left]");
 
@@ -479,6 +491,10 @@ const categoryImages = await Promise.all(
     }
     if (labelRight) labelRight.textContent = category.label;
     if (labelLeft) labelLeft.textContent = category.label;
+    if (backReserve) {
+      backReserve.dataset.bookingService = category.id;
+      backReserve.setAttribute("aria-label", `Reservar: ${category.title}`);
+    }
 
     if (backServices) {
       backServices.innerHTML = "";
@@ -601,6 +617,9 @@ const categoryImages = await Promise.all(
 
   document.addEventListener("keydown", (event) => {
     if (!isOpen) return;
+    // Con el modal de reserva abierto encima, Esc y las flechas son de ese modal (cerrarlo, moverse
+    // dentro de la fecha o del texto): no deben cerrar ni cambiar la categoría de este.
+    if (document.querySelector<HTMLDialogElement>("[data-booking-modal]")?.open) return;
     if (event.key === "Escape") closeModal();
     if (event.key === "ArrowLeft") goTo(-1);
     if (event.key === "ArrowRight") goTo(1);

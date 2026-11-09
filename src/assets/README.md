@@ -4,7 +4,8 @@ versiones WebP/AVIF redimensionadas, nunca estos archivos tal cual.
 - `logo.png`, `logo2.png` — logo completo y corona (masters en alta resolución).
 - `bg-*.png` — fondos de secciones. `bg-hero.mp4` — video del Hero.
 - `carrousel/` — fotos y video de la Galería. `card/` — fotos de las categorías de servicios.
-- `plan/plan-N.*` — fondo de Precios mientras el plan con `id` N está activo.
+- `about/` — fotos reales del salón (Sobre mí, Galería, fondos de "Elegí tu servicio").
+- `origen/` — material de Volver al Origen (logo, flyers y versiones derivadas).
 - `studies/titulo-N.jpg` — títulos y certificaciones de "Sobre mí".
 - `posters/` — primer frame de cada video, usado como portada.
 

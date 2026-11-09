@@ -4,7 +4,8 @@ Landing del salón **Reinas** (Otero 381, San Salvador de Jujuy). Sitio estátic
 [Astro](https://docs.astro.build) 7, Tailwind CSS v4 y TypeScript. Las reservas y consultas se hacen
 por WhatsApp: no hay backend.
 
-- **`/`** — Hero con video, Galería, Servicios (MySkills), Precios y Footer con formulario de contacto.
+- **`/`** — Hero con video, Galería, Servicios (MySkills), "Elegí tu servicio" (reservas), Volver al
+  Origen y Footer con formulario de contacto.
 - **`/sobre-mi`** — Biografía y grilla de títulos y certificaciones con visor ampliado.
 
 Modo claro/oscuro, pensado para funcionar desde 250px de ancho.
@@ -28,20 +29,18 @@ Para publicar, alcanza con subir el contenido de `dist/` a cualquier hosting est
 | Qué | Archivo |
 |---|---|
 | Marca, responsable, teléfono, WhatsApp, dirección, mapa, forma de atención y redes sociales | `src/data/contact.ts` |
-| Planes y precios (carrusel de Precios) | `src/data/pricing.ts` |
-| Categorías de servicios (tarjetas y modal de MySkills) | `src/data/skills.ts` |
+| Categorías de servicios (MySkills, "Elegí tu servicio" y el selector del modal de reserva) | `src/data/skills.ts` |
+| Talleres de Volver al Origen | `src/data/talleres.ts` |
 
 Detalles:
 
 - **`contact.ts`** es la única fuente de los datos de contacto: Hero, Footer, títulos de página y
   mensajes de WhatsApp leen de ahí. Una red social con `url: ""` no se muestra. `whatsapp` va solo
   con dígitos en formato internacional (`549...`). `buildWhatsAppUrl(texto)` arma el link `wa.me`.
-- **`pricing.ts`**: cada plan tiene `category`, `title`, `price` (número o "A consultar"), `period`,
-  `description` (lista), `featured` (etiqueta "Más elegido") y `flowerColor` (color de la flor
-  decorativa). El fondo de la sección mientras el plan está activo sale solo de
-  `src/assets/plan/plan-N.<png|jpg|webp|avif>`, con N = `id` del plan.
-- **`skills.ts`**: las fotos de cada categoría están en `src/assets/card/` y se asignan en
-  `src/components/MySkills.astro`, en el mismo orden que el array.
+- **`skills.ts`** es la única fuente del catálogo: cada categoría (nombre, descripción breve y lista de
+  servicios) aparece en Servicios, en "Elegí tu servicio" y en el selector del modal de reserva. La
+  foto del detalle se asigna por `id` en `MySkills.astro`; el fondo y el color de la flor de cada
+  tarjeta de reserva, en `ServicePicker.astro`. Por ahora el sitio no publica precios.
 - **Galería**: las 8 fotos, su orden y sus textos alternativos están al principio de
   `src/components/Gallery.astro`.
 - **Títulos de "Sobre mí"**: cualquier `src/assets/studies/titulo-N.jpg` aparece solo en la grilla,
@@ -75,7 +74,7 @@ publicado solo hay versiones WebP/AVIF al tamaño necesario, nunca los originale
 src/
 ├── assets/        imágenes y videos (originales; se optimizan en el build)
 ├── components/    secciones de la home, Navbar, Footer, BookingModal, etc.
-├── data/          contact.ts, pricing.ts, skills.ts
+├── data/          contact.ts, skills.ts, talleres.ts
 ├── layouts/       Layout.astro (head, tema claro/oscuro, modal de reserva)
 ├── lib/           booking.ts (mensajes de WhatsApp), images.ts (fondos optimizados)
 ├── pages/         index.astro (/) y sobre-mi.astro (/sobre-mi)
@@ -85,5 +84,5 @@ src/
 ## Pendientes de contenido
 
 - Cargar la URL de Instagram (`contact.ts`).
-- Reemplazar los precios de ejemplo (`pricing.ts`).
+- Confirmar con la dueña los servicios puntuales de cada categoría (`SERVICIOS-A-CONFIRMAR.md`).
 - Reemplazar la biografía de `/sobre-mi`.
