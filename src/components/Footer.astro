@@ -32,7 +32,7 @@ const socialLinks = [
     <div class="grid gap-12 md:grid-cols-2 md:gap-16">
       {/* Columna izquierda: logo + formulario */}
       <div>
-        <img src={logo.src} width={logo.width} height={logo.height} alt="Estética Reina" class="h-16 w-auto rounded-xl" />
+        <img src={logo.src} width={logo.width} height={logo.height} alt={contact.brand} class="h-16 w-auto rounded-xl" />
 
         <h3 class="mt-6 font-display text-2xl text-warmgray-100 sm:text-3xl">Escribinos</h3>
         <p class="mt-1 font-sans text-sm text-warmgray-100">Contanos qué necesitás y te abrimos WhatsApp con tu mensaje listo para enviar.</p>
@@ -104,7 +104,7 @@ const socialLinks = [
           class="h-64 w-full rounded-2xl border border-white/10 grayscale transition-all duration-500 hover:grayscale-0 sm:h-72"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
-          title="Ubicación de Estética Reina en el mapa"
+          title={`Ubicación de ${contact.brand} en el mapa`}
         >
         </iframe>
 
@@ -195,7 +195,7 @@ const socialLinks = [
     </div>
 
     <div class="mt-12 border-t border-white/10 pt-6 text-center font-sans text-xs text-warmgray-400">
-      © Estética Reina 2026. Todos los derechos reservados.
+      © {contact.brand} 2026. Todos los derechos reservados.
     </div>
   </div>
 </footer>

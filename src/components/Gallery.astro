@@ -11,6 +11,7 @@ import img6 from "../assets/carrousel/carrousel-6.jpg";
 import img7 from "../assets/carrousel/carrousel-7.jpg";
 import img8 from "../assets/carrousel/carrousel-8.jpg";
 import WaveDivider from "./WaveDivider.astro";
+import { contact } from "../data/contact";
 
 // El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda
 // central (columna 2, fila 2) es el video; las 8 fotos se reparten en el resto en orden.
@@ -64,7 +65,7 @@ const imageClass =
                     data-cell
                     tabindex="0"
                     role="button"
-                    aria-label={cell ? `Ver imagen ${position} de la galería en grande` : "Video de Estética Reina"}
+                    aria-label={cell ? `Ver imagen ${position} de la galería en grande` : `Video de ${contact.brand}`}
                     class="group relative cursor-pointer overflow-hidden rounded-xl bg-warmgray-800 outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
                   >
                     {cell ? (

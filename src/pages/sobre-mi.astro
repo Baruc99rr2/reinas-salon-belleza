@@ -2,9 +2,10 @@
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import { contact } from "../data/contact";
 ---
 
-<Layout title="Sobre mí | Estética Reina" description="Conocé el estudio de Estética Reina y a las personas detrás del salón.">
+<Layout title={`Sobre mí | ${contact.brand}`} description={`Conocé el estudio de ${contact.brand} y a las personas detrás del salón.`}>
   <Navbar />
 
   <main>
@@ -20,7 +21,7 @@ import Footer from "../components/Footer.astro";
         <h1 class="font-display text-4xl text-warmgray-800 md:text-5xl dark:text-warmgray-100">Sobre mí</h1>
         {/* Placeholder genérico — reemplazar por la biografía real. */}
         <p class="mx-auto mt-4 font-sans text-warmgray-600 dark:text-warmgray-400">
-          Detrás de Estética Reina hay años de formación, cursos y certificaciones en cuidado capilar, estética y bienestar. Cada
+          Detrás de {contact.brand} hay años de formación, cursos y certificaciones en cuidado capilar, estética y bienestar. Cada
           espacio del salón —y cada título en la pared de nuestro estudio— refleja ese compromiso con seguir aprendiendo para
           ofrecerte siempre el mejor cuidado.
         </p>
@@ -390,6 +391,8 @@ import Footer from "../components/Footer.astro";
 </script>
 
 <script>
+  import { contact } from "../data/contact";
+
   // --- Lightbox (paso 8): grilla con las 30 imágenes completas, cargadas con import.meta.glob
   // en vez de 30 imports a mano — se ordenan por el número en el nombre de archivo porque las
   // claves del glob no vienen garantizadas en orden numérico (titulo-10 antes que titulo-2, por
@@ -407,7 +410,7 @@ import Footer from "../components/Footer.astro";
   images.forEach(({ num, src }, index) => {
     const img = document.createElement("img");
     img.src = src;
-    img.alt = `Título o certificación ${num} de Estética Reina`;
+    img.alt = `Título o certificación ${num} de ${contact.brand}`;
     img.loading = "lazy";
     img.className = "aspect-[3/4] w-full cursor-pointer rounded-lg object-cover shadow-sm transition-transform hover:scale-[1.03]";
     img.addEventListener("click", () => openViewer(index));
@@ -452,7 +455,7 @@ import Footer from "../components/Footer.astro";
     viewerIndex = ((index % images.length) + images.length) % images.length;
     const current = images[viewerIndex];
     viewerImage.src = current.src;
-    viewerImage.alt = `Título o certificación ${current.num} de Estética Reina`;
+    viewerImage.alt = `Título o certificación ${current.num} de ${contact.brand}`;
   }
 
   function openViewer(index: number) {

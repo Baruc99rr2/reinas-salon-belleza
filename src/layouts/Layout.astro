@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import CustomScrollbar from "../components/CustomScrollbar.astro";
 import BookingModal from "../components/BookingModal.astro";
+import { contact } from "../data/contact";
 
 interface Props {
   title?: string;
@@ -9,8 +10,8 @@ interface Props {
 }
 
 const {
-  title = "Estética Reina | Salón de belleza",
-  description = "Salón de belleza especializado en cuidado capilar, estética y bienestar.",
+  title = `${contact.brand} | ${contact.tagline}`,
+  description = `${contact.brand}: centro de belleza integral especializado en cuidado capilar, estética y bienestar.`,
 } = Astro.props;
 ---
 

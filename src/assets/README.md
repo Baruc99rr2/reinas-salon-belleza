@@ -7,5 +7,5 @@ Cuando el logo esté listo, agregarlo acá (por ejemplo `logo.png`) e importarlo
 import logo from "../assets/logo.png";
 ---
 
-<img src={logo.src} alt="Estética Reina" class="h-12 w-12 rounded-full object-cover" />
+<img src={logo.src} alt="Reinas" class="h-12 w-12 rounded-full object-cover" />
 ```

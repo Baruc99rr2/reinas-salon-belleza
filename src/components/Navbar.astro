@@ -1,6 +1,7 @@
 ---
 import logoFull from "../assets/logo.png";
 import logoCrest from "../assets/logo2.png";
+import { contact } from "../data/contact";
 
 // "Sobre mí" es una página aparte (/sobre-mi); el resto son anclas de la home, con barra
 // inicial (/#seccion en vez de #seccion) para que funcionen igual estando en /sobre-mi.
@@ -35,7 +36,7 @@ const mobileLinkClass =
   <nav class="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4">
     <a
       href="/#hero"
-      aria-label="Estética Reina — Inicio"
+      aria-label={`${contact.brand} — Inicio`}
       class="relative flex h-10 min-w-0 shrink items-center sm:h-14 md:h-16"
     >
       <img
@@ -43,7 +44,7 @@ const mobileLinkClass =
         src={logoFull.src}
         width={logoFull.width}
         height={logoFull.height}
-        alt="Estética Reina — Centro de belleza integral"
+        alt={`${contact.brand} — ${contact.tagline}`}
         class="h-auto max-h-10 w-auto max-w-[42vw] sm:max-h-14 sm:max-w-[220px] md:max-h-16 md:max-w-none"
       />
       <img
@@ -51,7 +52,7 @@ const mobileLinkClass =
         src={logoCrest.src}
         width={logoCrest.width}
         height={logoCrest.height}
-        alt="Estética Reina"
+        alt={contact.brand}
         class="absolute left-0 h-auto max-h-8 w-auto max-w-[30vw] opacity-0 sm:max-h-10 sm:max-w-[160px] md:max-h-12 md:max-w-none"
       />
     </a>
