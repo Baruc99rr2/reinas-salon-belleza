@@ -1,11 +1,38 @@
 ---
-import { Picture, getImage } from "astro:assets";
+import { Image, Picture, getImage } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import WaveDivider from "../components/WaveDivider.astro";
+import ImageLightbox from "../components/ImageLightbox.astro";
+import OrigenMark from "../components/OrigenMark.astro";
 import { contact } from "../data/contact";
+import crown from "../assets/logo2.png";
+
+// Fotos del salón (src/assets/about/). Se eligieron 8 que no se repiten entre sí; las demás de la
+// carpeta son tomas casi iguales a estas o, en un caso, la tarjeta de presentación.
+import salonCabina from "../assets/about/imagen1.jpg";
+import salonLed from "../assets/about/photo_2026-10-30_19-03-58.jpg";
+import salonEquipo from "../assets/about/photo_2026-11-02_05-19-11.jpg";
+import salonLavado from "../assets/about/photo_2026-11-02_05-19-07 (2).jpg";
+import salonTocador from "../assets/about/photo_2026-11-02_05-19-10 (2).jpg";
+import salonVista from "../assets/about/photo_2026-11-02_05-19-08 (2).jpg";
+import salonNoche from "../assets/about/photo_2026-11-02_05-19-09.jpg";
+import salonRincon from "../assets/about/photo_2026-11-02_05-19-11 (2).jpg";
+
+const salonPhotos = await Promise.all(
+  [
+    { image: salonCabina, alt: "Cabina de tratamientos con camilla, equipo de aparatología y carrito de productos" },
+    { image: salonLed, alt: "Cabina de tratamientos con una máscara LED facial encendida sobre la camilla" },
+    { image: salonEquipo, alt: "Equipo de aparatología corporal del salón" },
+    { image: salonVista, alt: "Vista del salón: estantería con productos, espejos redondos iluminados y sillones" },
+    { image: salonTocador, alt: "Tocador con dos espejos redondos iluminados y un arreglo de flores" },
+    { image: salonLavado, alt: "Sector de lavado con sillones negros y estantería de productos" },
+    { image: salonNoche, alt: "El salón con luces de ambiente azules" },
+    { image: salonRincon, alt: "Rincón del salón con espejos iluminados, un sillón rosa y la puerta de entrada" },
+  ].map(async (photo) => ({ ...photo, full: await getImage({ src: photo.image, format: "webp", width: 1280 }) })),
+);
 
 // Todos los títulos de src/assets/studies/titulo-N.jpg, ordenados por N (las claves del glob vienen
 // en orden alfabético: titulo-10 antes que titulo-2). Para sumar uno nuevo alcanza con agregar el
@@ -23,9 +50,18 @@ const titles = await Promise.all(
       full: await getImage({ src: image, format: "webp", width: 1280 }),
     })),
 );
+
+const thumbClass =
+  "group block w-full cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-rose-200 transition-shadow hover:shadow-md " +
+  "focus-visible:ring-2 focus-visible:ring-rose-700 focus-visible:outline-none dark:bg-warmgray-800 dark:ring-warmgray-700 dark:focus-visible:ring-rose-300";
+const thumbImgClass =
+  "h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100";
 ---
 
-<Layout title={`Sobre mí | ${contact.brand}`} description={`Conocé el estudio de ${contact.brand} y a las personas detrás del salón.`}>
+<Layout
+  title={`Sobre mí | ${contact.brand}`}
+  description={`${contact.owner}, esteticista profesional y facilitadora de Constelaciones Familiares en San Salvador de Jujuy: ${contact.brand} y Volver al Origen.`}
+>
   <Navbar />
 
   <main>
@@ -38,14 +74,23 @@ const titles = await Promise.all(
       <div aria-hidden="true" class="pointer-events-none absolute -right-24 -bottom-32 h-72 w-72 rounded-full bg-rose-muted-strong/15 blur-3xl"></div>
 
       <div class="relative z-10 mx-auto max-w-2xl">
-        <p class="font-sans text-xs font-semibold tracking-widest text-rose-300 uppercase">Conocenos</p>
-        <h1 class="mt-2 font-display text-4xl text-white md:text-5xl">Sobre mí</h1>
-        {/* Placeholder genérico — se reemplaza por la biografía real en el próximo paso. */}
-        <p class="mx-auto mt-4 font-sans text-warmgray-100">
-          Detrás de {contact.brand} hay años de formación, cursos y certificaciones en cuidado capilar, estética y bienestar. Cada
-          espacio del salón —y cada título en la pared de nuestro estudio— refleja ese compromiso con seguir aprendiendo para
-          ofrecerte siempre el mejor cuidado.
-        </p>
+        <p class="font-sans text-xs font-semibold tracking-widest text-rose-300 uppercase">Sobre mí</p>
+        <h1 class="mt-2 font-display text-4xl text-white md:text-5xl">{contact.owner}</h1>
+
+        <div class="mx-auto mt-6 space-y-4 font-sans leading-relaxed text-warmgray-100">
+          <p>
+            {contact.owner} es esteticista profesional y facilitadora de constelaciones familiares en San Salvador de Jujuy. Su
+            propuesta une dos mundos que casi nadie junta: el cuidado del cuerpo y la conexión con el alma.
+          </p>
+          <p>
+            En {contact.brand} ofrece faciales, corporales, depilación definitiva, masajes, pestañas y cejas, con una estética
+            femenina, cálida y luminosa. Con «Volver al Origen» acompaña a las personas a mirar su historia familiar con amor, en
+            talleres grupales.
+          </p>
+          <p class="pt-2 font-display text-xl leading-snug text-rose-200 italic md:text-2xl">
+            Es una mujer que no solo embellece, sino que invita a cada clienta a sentirse reina, por fuera y por dentro.
+          </p>
+        </div>
       </div>
 
       <WaveDivider
@@ -58,7 +103,83 @@ const titles = await Promise.all(
       />
     </section>
 
-    <section id="titulos" class="bg-rose-50 px-3 py-16 sm:px-6 md:py-24 dark:bg-warmgray-900">
+    {/* Las dos caras de la propuesta. */}
+    <section class="bg-rose-50 px-3 pt-16 pb-8 sm:px-6 md:pt-20 dark:bg-warmgray-900">
+      <h2 class="sr-only">Por fuera y por dentro</h2>
+      <div class="mx-auto grid max-w-4xl gap-5 sm:grid-cols-2 sm:gap-6">
+        <a
+          href="/#skills"
+          class="group flex flex-col items-center rounded-3xl border border-rose-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-rose-700 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-8 dark:border-warmgray-700 dark:bg-warmgray-800 dark:focus-visible:ring-rose-300"
+        >
+          <Image src={crown} width={56} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-14 w-14 object-contain" />
+          <p class="mt-3 font-sans text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase dark:text-rose-300">Por fuera</p>
+          <h3 class="mt-1 font-display text-3xl text-warmgray-800 dark:text-warmgray-100">{contact.brand}</h3>
+          <p class="mt-3 font-sans text-sm leading-relaxed text-warmgray-700 dark:text-warmgray-100">
+            Faciales, corporales, depilación definitiva, masajes, pestañas y cejas.
+          </p>
+          <span class="mt-5 font-sans text-sm font-semibold text-rose-700 group-hover:underline dark:text-rose-300">
+            Ver servicios <span aria-hidden="true">→</span>
+          </span>
+        </a>
+
+        <a
+          href="/#volver-al-origen"
+          class="group flex flex-col items-center rounded-3xl border border-origen-watercolor/70 bg-origen-cream p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-origen-leaf-deep focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-8 dark:border-origen-gold/30 dark:bg-gradient-to-b dark:from-origen-night dark:to-origen-night-earth dark:focus-visible:ring-origen-gold"
+        >
+          <p class="font-sans text-xs font-semibold tracking-[0.2em] text-origen-leaf-deep uppercase dark:text-origen-gold">Por dentro</p>
+          <div class="mt-2 w-full max-w-[16rem]">
+            <OrigenMark as="h3" treeWidth={120} showMotto={false} size="sm" />
+          </div>
+          <p class="mt-2 font-sans text-sm leading-relaxed text-origen-ink-soft dark:text-origen-moon-soft">
+            Talleres grupales de Constelaciones Familiares para mirar tu historia familiar con amor.
+          </p>
+          <span class="mt-5 font-sans text-sm font-semibold text-origen-leaf-deep group-hover:underline dark:text-origen-gold">
+            Conocer más <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <section id="salon" class="bg-rose-50 px-3 py-16 sm:px-6 md:py-20 dark:bg-warmgray-900">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-10 text-center md:mb-14">
+          <p class="font-sans text-xs font-semibold tracking-widest text-rose-700 uppercase dark:text-rose-300">El salón</p>
+          <h2 class="mt-2 font-display text-3xl text-warmgray-800 md:text-5xl dark:text-warmgray-100">Un espacio para vos</h2>
+          <p class="mx-auto mt-3 max-w-xl font-sans text-warmgray-700 dark:text-warmgray-100">Tocá cualquier foto para verla en grande.</p>
+        </div>
+
+        <ul class="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
+          {
+            salonPhotos.map((photo) => (
+              <li>
+                <button
+                  type="button"
+                  data-lightbox-thumb
+                  data-full-src={photo.full.src}
+                  data-full-width={photo.full.attributes.width}
+                  data-full-height={photo.full.attributes.height}
+                  aria-haspopup="dialog"
+                  class={thumbClass}
+                >
+                  <Picture
+                    src={photo.image}
+                    formats={["avif"]}
+                    fallbackFormat="webp"
+                    widths={[200, 320, 480, 640]}
+                    sizes="(min-width: 1152px) 276px, (min-width: 768px) 25vw, 50vw"
+                    alt={photo.alt}
+                    loading="lazy"
+                    class={`aspect-[4/3] ${thumbImgClass}`}
+                  />
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="titulos" class="bg-rose-50 px-3 pt-4 pb-16 sm:px-6 md:pb-24 dark:bg-warmgray-900">
       <div class="mx-auto max-w-6xl">
         <div class="mb-10 text-center md:mb-14">
           <p class="font-sans text-xs font-semibold tracking-widest text-rose-700 uppercase dark:text-rose-300">Formación</p>
@@ -72,12 +193,12 @@ const titles = await Promise.all(
               <li>
                 <button
                   type="button"
-                  data-title-thumb
+                  data-lightbox-thumb
                   data-full-src={title.full.src}
                   data-full-width={title.full.attributes.width}
                   data-full-height={title.full.attributes.height}
                   aria-haspopup="dialog"
-                  class="group block w-full cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-rose-200 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-rose-700 focus-visible:outline-none dark:bg-warmgray-800 dark:ring-warmgray-700 dark:focus-visible:ring-rose-300"
+                  class={thumbClass}
                 >
                   <Picture
                     src={title.image}
@@ -87,7 +208,7 @@ const titles = await Promise.all(
                     sizes="(min-width: 1024px) 220px, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
                     alt={title.alt}
                     loading="lazy"
-                    class="aspect-[3/4] h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    class={`aspect-[3/4] ${thumbImgClass}`}
                   />
                 </button>
               </li>
@@ -98,75 +219,6 @@ const titles = await Promise.all(
     </section>
   </main>
 
-  {/* Lightbox: un título ampliado, nada más. Se cierra con la X, con Esc o tocando afuera. */}
-  <dialog
-    data-title-lightbox
-    aria-label="Título ampliado"
-    class="m-auto max-h-none max-w-none overflow-visible bg-transparent p-0 backdrop:bg-black/85"
-  >
-    <button
-      type="button"
-      data-lightbox-close
-      aria-label="Cerrar"
-      class="fixed top-3 right-3 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25 focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:outline-none"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
-    <img data-lightbox-image alt="" class="block h-auto max-h-[calc(100dvh-6rem)] w-auto max-w-[calc(100vw-2rem)] rounded-lg object-contain shadow-2xl" />
-  </dialog>
-
   <Footer />
+  <ImageLightbox />
 </Layout>
-
-<script>
-  const dialog = document.querySelector<HTMLDialogElement>("[data-title-lightbox]");
-  const image = dialog?.querySelector<HTMLImageElement>("[data-lightbox-image]");
-  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
-
-  let opener: HTMLButtonElement | null = null;
-
-  function openLightbox(thumb: HTMLButtonElement) {
-    if (!dialog || !image || dialog.open) return;
-    opener = thumb;
-    image.src = thumb.dataset.fullSrc ?? "";
-    image.width = Number(thumb.dataset.fullWidth) || 0;
-    image.height = Number(thumb.dataset.fullHeight) || 0;
-    image.alt = thumb.querySelector("img")?.alt ?? "";
-
-    dialog.showModal();
-    document.body.style.overflow = "hidden";
-    closeBtn?.focus();
-  }
-
-  document.querySelectorAll<HTMLButtonElement>("[data-title-thumb]").forEach((thumb) => {
-    thumb.addEventListener("click", () => openLightbox(thumb));
-  });
-
-  // Esc (nativo del <dialog>), X y click afuera terminan todos acá: el foco vuelve a la miniatura.
-  dialog?.addEventListener("close", () => {
-    document.body.style.overflow = "";
-    opener?.focus();
-    opener = null;
-  });
-
-  closeBtn?.addEventListener("click", () => dialog?.close());
-
-  // Click afuera = sobre el backdrop (el propio <dialog>), no sobre la imagen.
-  let pointerDownOutside = false;
-  dialog?.addEventListener("pointerdown", (event) => {
-    pointerDownOutside = event.target === dialog;
-  });
-  dialog?.addEventListener("click", (event) => {
-    if (event.target === dialog && pointerDownOutside) dialog.close();
-    pointerDownOutside = false;
-  });
-
-  // Foco atrapado: el único elemento enfocable adentro es la X, así que Tab y Shift+Tab se quedan ahí.
-  dialog?.addEventListener("keydown", (event) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    closeBtn?.focus();
-  });
-</script>

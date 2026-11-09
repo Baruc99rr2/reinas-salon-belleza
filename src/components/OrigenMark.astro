@@ -15,9 +15,12 @@ interface Props {
   /** Ancho del árbol en px (se genera también la versión 2x). */
   treeWidth?: number;
   showMotto?: boolean;
+  /** "lg": título de sección (home). "sm": dentro de una tarjeta. */
+  size?: "lg" | "sm";
 }
 
-const { as: NameTag = "h2", treeWidth = 220, showMotto = true } = Astro.props;
+const { as: NameTag = "h2", treeWidth = 220, showMotto = true, size = "lg" } = Astro.props;
+const nameSize = size === "lg" ? "text-[clamp(2.75rem,12vw,4.5rem)]" : "text-[2.6rem]";
 ---
 
 <div class="flex flex-col items-center text-center">
@@ -28,7 +31,7 @@ const { as: NameTag = "h2", treeWidth = 220, showMotto = true } = Astro.props;
     <Image src={tree} width={treeWidth} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-auto w-[76%]" />
   </div>
 
-  <NameTag class="mt-1 font-origen text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.1] text-origen-wine dark:text-origen-blush">
+  <NameTag class:list={["mt-1 font-origen leading-[1.1] text-origen-wine dark:text-origen-blush", nameSize]}>
     Volver al Origen
   </NameTag>
 
