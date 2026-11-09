@@ -1,6 +1,7 @@
 ---
 import { pricingPlans } from "../data/pricing";
 import WaveDivider from "./WaveDivider.astro";
+import PricingFlower from "./PricingFlower.astro";
 ---
 
 <section id="pricing" class="relative overflow-hidden bg-rose-50 px-3 py-20 sm:px-6 md:py-28 dark:bg-warmgray-900">
@@ -43,18 +44,16 @@ import WaveDivider from "./WaveDivider.astro";
                 ]}
               >
                 {plan.featured && (
-                  <span class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white shadow">
+                  <span class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-rose-700 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white shadow">
                     Más elegido
                   </span>
                 )}
 
-                <canvas
-                  data-shape-canvas
-                  data-flower-color={plan.flowerColor ?? "#c98ba0"}
-                  width="160"
-                  height="160"
+                <PricingFlower
+                  color={plan.flowerColor ?? "#c98ba0"}
+                  uid={`pricing-flower-${plan.id}`}
+                  index={i}
                   class="pointer-events-none absolute top-1.5 right-1.5 z-0 h-14 w-14 opacity-60 sm:top-2 sm:right-2 sm:h-20 sm:w-20"
-                  aria-hidden="true"
                 />
 
                 <div class="relative z-10 flex flex-1 flex-col text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
@@ -98,7 +97,7 @@ import WaveDivider from "./WaveDivider.astro";
                     data-booking-plan={plan.title}
                     aria-haspopup="dialog"
                     aria-label={`Consultar por ${plan.title}`}
-                    class="mt-6 w-full cursor-pointer rounded-full bg-rose-500 px-4 py-2.5 font-sans text-sm font-semibold text-white transition-colors hover:bg-rose-600 dark:hover:bg-rose-muted-strong"
+                    class="mt-6 w-full cursor-pointer rounded-full bg-rose-700 px-4 py-2.5 font-sans text-sm font-semibold text-white transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:outline-none"
                   >
                     Consultar
                   </button>
@@ -187,6 +186,14 @@ import WaveDivider from "./WaveDivider.astro";
     }
   }
 
+  /* Con "reducir movimiento" los cambios de plan son instantáneos (sin deslizamiento ni fundido). */
+  @media (prefers-reduced-motion: reduce) {
+    .pricing-card,
+    .pricing-bg-layer {
+      transition: none;
+    }
+  }
+
   [data-dot].is-active {
     background-color: var(--color-rose-500, #e8709a);
     width: 1.5rem;
@@ -220,6 +227,13 @@ import WaveDivider from "./WaveDivider.astro";
   let activeIndex = 0;
   let autoplayTimer: ReturnType<typeof setInterval> | undefined;
   let isTransitioning = false;
+
+  // El autoplay corre solo si no hay ningún motivo de pausa activo: mouse encima, foco adentro,
+  // modal de reserva abierto o "reducir movimiento" en el sistema. Con un Set, cada motivo se
+  // agrega/quita por separado y uno no pisa al otro (ej.: al cerrar el modal el foco vuelve a
+  // "Consultar", así que la pausa por foco sigue vigente aunque se haya ido la del modal).
+  const pauseReasons = new Set<string>();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   // Dos capas <img> superpuestas, alternando cuál está "arriba" (opacity 1): la de atrás
   // recibe el src del plan nuevo y sube a opacity 1 mientras la de adelante baja a 0, al mismo
@@ -280,18 +294,26 @@ import WaveDivider from "./WaveDivider.astro";
 
   function stopAutoplay() {
     if (autoplayTimer) clearInterval(autoplayTimer);
+    autoplayTimer = undefined;
   }
 
   function startAutoplay() {
     stopAutoplay();
+    if (pauseReasons.size > 0) return;
     autoplayTimer = setInterval(() => {
       if (!document.hidden) goTo(activeIndex + 1);
     }, AUTOPLAY_MS);
   }
 
+  function setPaused(reason: string, paused: boolean) {
+    if (paused) pauseReasons.add(reason);
+    else pauseReasons.delete(reason);
+    startAutoplay();
+  }
+
   function manualGoTo(index: number) {
     goTo(index);
-    startAutoplay();
+    startAutoplay(); // reinicia la cuenta (si no hay pausas activas)
   }
 
   prevBtn?.addEventListener("click", () => manualGoTo(activeIndex - 1));
@@ -325,176 +347,37 @@ import WaveDivider from "./WaveDivider.astro";
     { passive: true },
   );
 
+  // Hover solo con mouse: en pantallas táctiles un toque dispara "enter" pero casi nunca "leave",
+  // y el carrusel quedaría pausado para siempre.
+  stage?.addEventListener("pointerenter", (event) => {
+    if (event.pointerType === "mouse") setPaused("hover", true);
+  });
+  stage?.addEventListener("pointerleave", (event) => {
+    if (event.pointerType === "mouse") setPaused("hover", false);
+  });
+
+  // Foco: pausa con foco visible (teclado). Un click o toque en las flechas también les da foco,
+  // pero ahí ya actúa el hover (o, en touch, el swipe/autoplay normal).
+  stage?.addEventListener("focusin", (event) => {
+    if ((event.target as Element).matches(":focus-visible")) setPaused("focus", true);
+  });
+  stage?.addEventListener("focusout", (event) => {
+    // Solo si el foco salió del carrusel (no si pasó de un botón a otro dentro de él).
+    if (!stage.contains(event.relatedTarget as Node | null)) setPaused("focus", false);
+  });
+
   // Mientras el modal de reserva está abierto el carrusel no avanza: así la card desde la que se
-  // abrió sigue siendo la activa y el foco puede volver a su botón "Consultar" al cerrar.
-  document.addEventListener("booking:open", stopAutoplay);
-  document.addEventListener("booking:close", startAutoplay);
+  // abrió sigue siendo la activa. Al cerrar, el foco vuelve a su "Consultar": si quedó adentro del
+  // carrusel, la pausa pasa a ser por foco hasta que salga.
+  document.addEventListener("booking:open", () => setPaused("modal", true));
+  document.addEventListener("booking:close", () => {
+    if (stage?.contains(document.activeElement)) pauseReasons.add("focus");
+    setPaused("modal", false);
+  });
+
+  if (reducedMotion.matches) pauseReasons.add("reduced-motion");
+  reducedMotion.addEventListener("change", (event) => setPaused("reduced-motion", event.matches));
 
   render();
   startAutoplay();
-</script>
-
-<script>
-  // --- Formas 3D decorativas por card (Three.js) ---
-  // En desktop rotan solas en loop; en mobile se renderiza un único frame estático
-  // y jamás se arranca el loop de rAF, para no gastar recursos en gama baja.
-  //
-  // Estas formas dependen de medir el tamaño real (en píxeles) del canvas, que solo
-  // es confiable una vez que el layout terminó de aplicarse. Si se mide antes (por
-  // ejemplo en un hard reload donde el JS puede ejecutar antes de que el CSS termine
-  // de pintar), clientWidth puede devolver 0. Por eso: (1) esperamos el evento
-  // `load` en vez de inicializar apenas el módulo se evalúa, (2) si aun así el
-  // ancho medido es 0, reintentamos en el próximo frame en vez de inicializar con
-  // un tamaño inválido, y (3) cada card se inicializa en su propio try/catch para
-  // que un fallo (WebGL no disponible, contexto perdido, etc.) en una card no
-  // interrumpa la inicialización de las demás ni del resto de la página.
-  import * as THREE from "three";
-
-  const DEFAULT_FLOWER_COLOR = "#c98ba0";
-  const FLOWER_CENTER_COLOR = 0xf4d35e;
-  const PETAL_COUNT = 6;
-  const MAX_SIZE_RETRIES = 30;
-  const desktopQuery = window.matchMedia("(min-width: 768px)");
-
-  // Contorno de un pétalo dibujado con curvas bézier: arranca y termina en el
-  // centro (0,0), se abre hacia los costados y cierra en punta arriba.
-  function createPetalGeometry(): THREE.ExtrudeGeometry {
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.bezierCurveTo(0.32, 0.18, 0.3, 0.68, 0, 0.95);
-    shape.bezierCurveTo(-0.3, 0.68, -0.32, 0.18, 0, 0);
-
-    const geometry = new THREE.ExtrudeGeometry(shape, {
-      depth: 0.08,
-      bevelEnabled: true,
-      bevelThickness: 0.025,
-      bevelSize: 0.025,
-      bevelSegments: 1,
-      curveSegments: 5,
-    });
-    geometry.translate(0, 0, -0.04);
-    return geometry;
-  }
-
-  // Flor low-poly: un pétalo repetido y rotado alrededor del eje central, más
-  // una esfera aplanada al centro en un tono distinto (el "corazón" de la flor).
-  function createFlower(petalColorHex: string): THREE.Group {
-    const flower = new THREE.Group();
-
-    const petalGeometry = createPetalGeometry();
-    const petalMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(petalColorHex),
-      roughness: 0.45,
-      metalness: 0.05,
-      flatShading: true,
-      side: THREE.DoubleSide,
-    });
-
-    for (let i = 0; i < PETAL_COUNT; i++) {
-      const petal = new THREE.Mesh(petalGeometry, petalMaterial);
-      petal.rotation.z = (i / PETAL_COUNT) * Math.PI * 2;
-      flower.add(petal);
-    }
-
-    const centerGeometry = new THREE.SphereGeometry(0.26, 8, 6);
-    centerGeometry.scale(1, 1, 0.55);
-    const centerMaterial = new THREE.MeshStandardMaterial({
-      color: FLOWER_CENTER_COLOR,
-      roughness: 0.4,
-      metalness: 0.1,
-      flatShading: true,
-    });
-    const center = new THREE.Mesh(centerGeometry, centerMaterial);
-    center.position.z = 0.05;
-    flower.add(center);
-
-    return flower;
-  }
-
-  function initShape(canvas: HTMLCanvasElement, index: number, size: number) {
-    const petalColorHex = canvas.dataset.flowerColor || DEFAULT_FLOWER_COLOR;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(size, size, false);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10);
-    camera.position.set(0, 0, 3.2);
-
-    const flower = createFlower(petalColorHex);
-    flower.rotation.set(0.4, index * 0.6, 0.1);
-    scene.add(flower);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    keyLight.position.set(2, 2, 3);
-    scene.add(keyLight);
-
-    let rafId: number | undefined;
-
-    function renderFrame() {
-      renderer.render(scene, camera);
-    }
-
-    function animate() {
-      flower.rotation.x += 0.004;
-      flower.rotation.y += 0.006;
-      renderFrame();
-      rafId = requestAnimationFrame(animate);
-    }
-
-    function start() {
-      if (rafId !== undefined) return;
-      animate();
-    }
-
-    function stop() {
-      if (rafId !== undefined) {
-        cancelAnimationFrame(rafId);
-        rafId = undefined;
-      }
-      renderFrame();
-    }
-
-    if (desktopQuery.matches) {
-      start();
-    } else {
-      renderFrame();
-    }
-
-    desktopQuery.addEventListener("change", (e) => {
-      if (e.matches) start();
-      else stop();
-    });
-  }
-
-  function setupShapeWhenReady(canvas: HTMLCanvasElement, index: number, attempt = 0) {
-    const size = canvas.clientWidth;
-
-    if (size === 0 && attempt < MAX_SIZE_RETRIES) {
-      requestAnimationFrame(() => setupShapeWhenReady(canvas, index, attempt + 1));
-      return;
-    }
-
-    try {
-      initShape(canvas, index, size || 80);
-    } catch (error) {
-      console.error(`[Pricing] No se pudo inicializar la forma 3D de la card ${index}:`, error);
-    }
-  }
-
-  function initAllShapes() {
-    document.querySelectorAll<HTMLCanvasElement>("[data-shape-canvas]").forEach((canvas, i) => {
-      setupShapeWhenReady(canvas, i);
-    });
-  }
-
-  // Esperamos a que la página (imágenes, fuentes, CSS) termine de cargar por completo
-  // antes de medir nada, en vez de correr apenas se evalúa este módulo.
-  if (document.readyState === "complete") {
-    initAllShapes();
-  } else {
-    window.addEventListener("load", initAllShapes, { once: true });
-  }
 </script>
