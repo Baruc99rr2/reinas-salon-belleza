@@ -84,4 +84,3 @@ src/
 ## Pendientes de contenido
 
 - Confirmar con la dueña los servicios puntuales de cada categoría (`SERVICIOS-A-CONFIRMAR.md`).
-- Reemplazar la biografía de `/sobre-mi`.
