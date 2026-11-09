@@ -27,7 +27,7 @@ Para publicar, alcanza con subir el contenido de `dist/` a cualquier hosting est
 
 | Qué | Archivo |
 |---|---|
-| Marca, responsable, teléfono, WhatsApp, dirección, mapa, horario y redes sociales | `src/data/contact.ts` |
+| Marca, responsable, teléfono, WhatsApp, dirección, mapa, forma de atención y redes sociales | `src/data/contact.ts` |
 | Planes y precios (carrusel de Precios) | `src/data/pricing.ts` |
 | Categorías de servicios (tarjetas y modal de MySkills) | `src/data/skills.ts` |
 
@@ -82,7 +82,6 @@ src/
 
 ## Pendientes de contenido
 
-- Confirmar el horario real (`contact.ts`).
-- Cargar las URLs de Instagram, Facebook y TikTok (`contact.ts`).
+- Cargar la URL de Instagram (`contact.ts`).
 - Reemplazar los precios de ejemplo (`pricing.ts`).
 - Reemplazar la biografía de `/sobre-mi`.

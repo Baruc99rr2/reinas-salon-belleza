@@ -1,19 +1,18 @@
 // Datos de contacto y de marca del salón: única fuente de verdad. Hero, Footer y el resto del
-// sitio leen de acá — para cambiar un teléfono, horario o red social, se cambia solo en este archivo.
+// sitio leen de acá — para cambiar un teléfono, la forma de atención o una red social, se cambia solo en este archivo.
 
 export interface SocialLink {
-  name: "Instagram" | "Facebook" | "TikTok";
+  name: "Instagram" | "Facebook";
   /** URL completa del perfil. Si está vacía, el ícono no se muestra en el sitio. */
   url: string;
 }
 
 const address = "Otero 381, Barrio Centro, San Salvador de Jujuy";
 
-// TODO: completar las URLs de los perfiles cuando estén disponibles.
+// Instagram queda vacío (oculto en el sitio) hasta tener la URL confirmada.
 const socials: SocialLink[] = [
   { name: "Instagram", url: "" },
-  { name: "Facebook", url: "" },
-  { name: "TikTok", url: "" },
+  { name: "Facebook", url: "https://www.facebook.com/profile.php?id=61595963794706" },
 ];
 
 export const contact = {
@@ -30,8 +29,8 @@ export const contact = {
   /** Mapa embebido de Google Maps (iframe del Footer), generado a partir de la dirección. */
   mapEmbedUrl: `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`,
 
-  // TODO: confirmar con el salón el horario real de atención.
-  hours: "Lun a Sáb: 9 a 19 hs",
+  /** No hay horario fijo: se atiende con turno. Se muestra en Hero y Footer bajo "Atención". */
+  hours: "Atención con turno previo",
 
   socials,
 };
