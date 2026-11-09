@@ -6,7 +6,8 @@ por WhatsApp: no hay backend.
 
 - **`/`** — Hero con video, Galería, Servicios (MySkills), "Elegí tu servicio" (reservas), Volver al
   Origen y Footer con formulario de contacto.
-- **`/sobre-mi`** — Biografía y grilla de títulos y certificaciones con visor ampliado.
+- **`/sobre-mi/`** — Biografía, las dos caras de la propuesta, fotos del salón y títulos.
+- **404** — página propia para direcciones que no existen.
 
 Modo claro/oscuro, pensado para funcionar desde 250px de ancho.
 
@@ -22,7 +23,27 @@ npm run preview    # sirve dist/ para revisarlo antes de publicar
 npx astro check    # chequeo de tipos de .astro y .ts
 ```
 
-Para publicar, alcanza con subir el contenido de `dist/` a cualquier hosting estático.
+Para publicar, alcanza con subir el contenido de `dist/` a cualquier hosting estático (hoy:
+Vercel, en https://reinas-salon-belleza.vercel.app).
+
+## SEO y vista previa al compartir
+
+- **URL del sitio:** solo en `astro.config.mjs` (`site`). Canonical, Open Graph, JSON-LD, sitemap y
+  `robots.txt` la toman de ahí; si cambia el dominio, se cambia en ese único lugar.
+- **Título y descripción** de cada página: props de `<Layout>` en `src/pages/index.astro` y
+  `src/pages/sobre-mi.astro`.
+- **Sitemap:** `@astrojs/sitemap` genera `sitemap-index.xml` en el build (sin la 404).
+  `robots.txt` se genera desde `src/pages/robots.txt.ts`.
+- **Datos estructurados:** `src/components/LocalBusinessSchema.astro` (schema.org `BeautySalon`, en
+  la home). Sale de `contact.ts` (incluida la dirección por partes, `postalAddress`) y `skills.ts`.
+  No lleva horarios ni la dirección de los talleres.
+- **Imagen para compartir** (WhatsApp, Facebook, X): `public/og-image.jpg`, 1200x630. Plantilla en
+  `scripts/og-image.html` (abrirla en el navegador a 1200x630 y capturar). El contenido va dentro del
+  cuadrado central de 630px, porque WhatsApp a veces recorta la vista previa en cuadrado.
+- **Íconos** (favicon, apple-touch-icon, 192/512 y `site.webmanifest`): `python scripts/generate-icons.py`
+  los regenera desde la corona (`src/assets/logo2.png`).
+- **Tipografías:** autoalojadas con `@fontsource` (Playfair Display, Poppins y Alex Brush para
+  Volver al Origen); no se pide nada a Google Fonts.
 
 ## Dónde se editan los datos
 
@@ -82,11 +103,13 @@ publicado solo hay versiones WebP/AVIF al tamaño necesario, nunca los originale
 src/
 ├── assets/        imágenes y videos (originales; se optimizan en el build)
 ├── components/    secciones de la home, Navbar, Footer, BookingModal, etc.
-├── data/          contact.ts, skills.ts, talleres.ts
+├── data/          contact.ts, skills.ts, talleres.ts, salon.ts (fotos del salón)
 ├── layouts/       Layout.astro (head, tema claro/oscuro, modal de reserva)
 ├── lib/           booking.ts (mensajes de WhatsApp), images.ts (fondos optimizados)
-├── pages/         index.astro (/) y sobre-mi.astro (/sobre-mi)
+├── pages/         index.astro (/), sobre-mi.astro (/sobre-mi/), 404.astro y robots.txt.ts
 └── styles/        global.css (paleta, tipografías y ajustes globales)
+public/            og-image.jpg, íconos y site.webmanifest
+scripts/           og-image.html y generate-icons.py (para regenerar imagen e íconos)
 ```
 
 ## Pendientes de contenido

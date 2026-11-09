@@ -127,14 +127,16 @@ const firstBg = bgUrls[0] ?? "";
         </svg>
       </button>
 
-      <div class="mt-6 flex justify-center gap-2" data-dots>
+      {/* Cada punto es un botón de 24x24px (área táctil cómoda); con p-2 + bg-clip-content solo se
+         pinta el punto de 8px del centro, así que se ve igual que antes. */}
+      <div class="mt-4 flex justify-center" data-dots>
         {
           skillCategories.map((category, i) => (
             <button
               type="button"
               data-dot={i}
               aria-label={`Ver ${category.title}`}
-              class="h-2 w-2 rounded-full bg-rose-200 transition-all duration-300 dark:bg-warmgray-700"
+              class="h-6 w-6 cursor-pointer rounded-full bg-rose-200 bg-clip-content p-2 transition-all duration-300 dark:bg-warmgray-700"
             />
           ))
         }
@@ -194,7 +196,8 @@ const firstBg = bgUrls[0] ?? "";
 
   [data-dot].is-active {
     background-color: var(--color-rose-500, #e8709a);
-    width: 1.5rem;
+    /* 1.5rem de punto visible + 1rem de padding (el área táctil). */
+    width: 2.5rem;
     border-radius: 9999px;
   }
 
@@ -264,6 +267,9 @@ const firstBg = bgUrls[0] ?? "";
       const isActive = offset === 0;
       card.style.pointerEvents = isActive ? "auto" : "none";
       card.setAttribute("aria-hidden", isActive ? "false" : "true");
+      // inert: las tarjetas de los costados (atenuadas) no reciben foco ni se leen; su botón no
+      // queda accesible por teclado mientras la tarjeta no está al frente.
+      card.inert = !isActive;
     });
 
     dots.forEach((dot, i) => dot.classList.toggle("is-active", i === activeIndex));

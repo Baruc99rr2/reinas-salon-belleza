@@ -30,7 +30,7 @@
   --color-rose-muted-strong: #a9697f;
 
   /* Tipografías */
-  --font-display: "Playfair Display", serif;
+  --font-display: "Playfair Display Variable", "Playfair Display", serif;
   --font-sans: "Poppins", sans-serif;
   /* Script de "Volver al Origen". El @font-face se importa solo en OrigenMark.astro, así que la
      fuente se descarga únicamente en las páginas que la usan. */

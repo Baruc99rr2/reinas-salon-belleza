@@ -1,4 +1,11 @@
 ---
+// Tipografías autoalojadas (@fontsource): sin pedidos a Google Fonts que bloqueen el primer render.
+// Cada @font-face trae su unicode-range, así que el navegador baja solo los subconjuntos que usa.
+import "@fontsource-variable/playfair-display/wght.css";
+import "@fontsource-variable/playfair-display/wght-italic.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
 import "../styles/global.css";
 import CustomScrollbar from "../components/CustomScrollbar.astro";
 import BookingModal from "../components/BookingModal.astro";
@@ -48,8 +55,8 @@ const ogImageAlt = `Corona de ${contact.brand} y el texto "${contact.brand} · $
 
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {/* Las páginas que no se indexan (404) no llevan canonical. */}
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
 
     {/* Íconos (generados con scripts/generate-icons.py a partir de la corona) */}
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -79,12 +86,6 @@ const ogImageAlt = `Corona de ${contact.brand} y el texto "${contact.brand} · $
     {/* Datos propios de cada página (ej. JSON-LD en la home). */}
     <slot name="head" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body class="overflow-x-hidden bg-white font-sans text-warmgray-800 antialiased dark:bg-warmgray-900 dark:text-warmgray-100">
     <slot />

@@ -6,6 +6,10 @@ import { contact, phoneHref, buildWhatsAppUrl } from "../data/contact";
 
 const { address, phoneDisplay, hours, mapEmbedUrl } = contact;
 
+// WhatsApp del salón con un saludo genérico: ícono de redes y link de respaldo del formulario
+// (antes de enviar; al enviar, el script lo cambia por el link con el mensaje de la clienta).
+const genericWhatsAppUrl = buildWhatsAppUrl(`Hola ${contact.brand}, quiero hacer una consulta.`);
+
 const hoverClasses: Record<string, string> = {
   Instagram: "hover:text-[#e1306c]",
   Facebook: "hover:text-[#1877f2]",
@@ -16,7 +20,7 @@ const hoverClasses: Record<string, string> = {
 // WhatsApp va siempre, armado con el número del salón.
 const socialLinks = [
   ...contact.socials.filter((social) => social.url.trim() !== ""),
-  { name: "WhatsApp", url: buildWhatsAppUrl(`Hola ${contact.brand}, quiero hacer una consulta.`) },
+  { name: "WhatsApp", url: genericWhatsAppUrl },
 ].map((social) => ({ ...social, hoverClass: hoverClasses[social.name] }));
 ---
 
@@ -92,7 +96,7 @@ const socialLinks = [
              envía en WhatsApp), y deja un link de respaldo por si el navegador bloqueó la pestaña. */}
           <p data-contact-status role="status" class="font-sans text-sm text-warmgray-100" hidden>
             Abrimos WhatsApp en una pestaña nueva con tu mensaje. Para que nos llegue, tocá “Enviar” en WhatsApp.
-            ¿No se abrió? <a data-contact-fallback href="" target="_blank" rel="noopener noreferrer" class="font-semibold text-rose-300 underline underline-offset-2">Abrir WhatsApp</a>
+            ¿No se abrió? <a data-contact-fallback href={genericWhatsAppUrl} target="_blank" rel="noopener noreferrer" class="font-semibold text-rose-300 underline underline-offset-2">Abrir WhatsApp</a>
           </p>
         </form>
       </div>
