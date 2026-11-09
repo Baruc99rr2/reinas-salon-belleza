@@ -94,7 +94,11 @@ import WaveDivider from "./WaveDivider.astro";
 
                   <button
                     type="button"
-                    class="mt-6 w-full rounded-full bg-rose-500 px-4 py-2.5 font-sans text-sm font-semibold text-white transition-colors hover:bg-rose-600 dark:hover:bg-rose-muted-strong"
+                    data-booking-trigger
+                    data-booking-plan={plan.title}
+                    aria-haspopup="dialog"
+                    aria-label={`Consultar por ${plan.title}`}
+                    class="mt-6 w-full cursor-pointer rounded-full bg-rose-500 px-4 py-2.5 font-sans text-sm font-semibold text-white transition-colors hover:bg-rose-600 dark:hover:bg-rose-muted-strong"
                   >
                     Consultar
                   </button>
@@ -320,6 +324,11 @@ import WaveDivider from "./WaveDivider.astro";
     },
     { passive: true },
   );
+
+  // Mientras el modal de reserva está abierto el carrusel no avanza: así la card desde la que se
+  // abrió sigue siendo la activa y el foco puede volver a su botón "Consultar" al cerrar.
+  document.addEventListener("booking:open", stopAutoplay);
+  document.addEventListener("booking:close", startAutoplay);
 
   render();
   startAutoplay();

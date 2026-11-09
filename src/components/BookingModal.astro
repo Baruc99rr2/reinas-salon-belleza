@@ -1,0 +1,216 @@
+---
+// Modal de reserva por WhatsApp. Se incluye una sola vez en Layout.astro y lo abre cualquier
+// elemento con el atributo data-booking-trigger (opcional: data-booking-plan="Nombre del plan").
+//
+//   <button type="button" data-booking-trigger data-booking-plan="Corte + Brushing">Consultar</button>
+//
+// Usa <dialog> nativo con showModal(): el resto de la página queda inerte mientras está abierto.
+// Encima de eso el script atrapa el foco con Tab, cierra con Esc / X / click afuera y devuelve
+// el foco al botón que lo abrió. Emite "booking:open" y "booking:close" en document para que
+// otros componentes reaccionen (Pricing pausa su autoplay).
+---
+
+<dialog
+  data-booking-modal
+  aria-labelledby="booking-title"
+  aria-describedby="booking-description"
+  class="booking-modal m-auto max-h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] max-w-md overflow-y-auto rounded-2xl border border-rose-200 bg-white p-0 text-warmgray-800 shadow-2xl backdrop:bg-warmgray-900/70 backdrop:backdrop-blur-sm dark:border-warmgray-700 dark:bg-warmgray-800 dark:text-warmgray-100 dark:backdrop:bg-black/80"
+>
+  <form data-booking-form novalidate class="relative p-4 sm:p-7">
+    <button
+      type="button"
+      data-booking-close
+      aria-label="Cerrar"
+      class="absolute top-2 right-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-warmgray-700 transition-colors hover:bg-rose-50 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none sm:top-3 sm:right-3 dark:text-warmgray-100 dark:hover:bg-warmgray-700"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <p class="pr-10 font-sans text-xs font-semibold tracking-widest text-rose-700 uppercase dark:text-rose-300">Reservas</p>
+    <h2 id="booking-title" class="mt-1 pr-10 font-display text-2xl leading-tight sm:text-3xl">Reservá tu turno</h2>
+    <p id="booking-description" class="mt-2 font-sans text-sm text-warmgray-700 dark:text-warmgray-100">
+      Elegí el día y te abrimos WhatsApp con el mensaje listo para enviar. El horario lo coordinamos por ahí.
+    </p>
+
+    <p
+      data-booking-plan-wrap
+      hidden
+      class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 font-sans text-sm dark:border-warmgray-700 dark:bg-warmgray-900"
+    >
+      <span class="text-warmgray-700 dark:text-warmgray-100">Servicio elegido:</span>{" "}
+      <strong data-booking-plan-name class="font-semibold text-rose-700 dark:text-rose-300"></strong>
+    </p>
+
+    <div class="mt-5">
+      <label for="booking-date" class="mb-1.5 block font-sans text-xs font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">
+        Fecha del turno
+      </label>
+      <input
+        id="booking-date"
+        name="date"
+        type="date"
+        required
+        aria-describedby="booking-date-hint"
+        class="w-full min-w-0 rounded-lg border border-rose-200 bg-white px-3 py-2.5 font-sans text-sm text-warmgray-800 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/40 dark:border-warmgray-700 dark:bg-warmgray-900 dark:text-warmgray-100 dark:[color-scheme:dark]"
+      />
+      <p id="booking-date-hint" class="mt-1 font-sans text-xs text-warmgray-700 dark:text-warmgray-100">Desde hoy en adelante.</p>
+    </div>
+
+    <div class="mt-4">
+      <label for="booking-message" class="mb-1.5 block font-sans text-xs font-semibold tracking-wide text-warmgray-700 uppercase dark:text-warmgray-100">
+        Mensaje o consulta <span class="font-normal normal-case">(opcional)</span>
+      </label>
+      <textarea
+        id="booking-message"
+        name="message"
+        rows="3"
+        class="w-full resize-none rounded-lg border border-rose-200 bg-white px-3 py-2.5 font-sans text-sm text-warmgray-800 outline-none placeholder:text-warmgray-600 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/40 dark:border-warmgray-700 dark:bg-warmgray-900 dark:text-warmgray-100 dark:placeholder:text-warmgray-400"
+        placeholder="Ej.: prefiero por la tarde"></textarea>
+    </div>
+
+    <button
+      type="submit"
+      data-booking-submit
+      disabled
+      class="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-rose-700 px-4 py-3 font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:brightness-100 dark:focus-visible:ring-offset-warmgray-800"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 shrink-0" aria-hidden="true">
+        <path
+          d="M12 2.5a9.5 9.5 0 00-8.2 14.3L2.5 21l4.3-1.3A9.5 9.5 0 1012 2.5zm5.3 13.4c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .2-3.2-.7-2.7-1.1-4.5-3.8-4.6-4-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .5.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.1.3-.3.4-.1.2-.3.3-.4.5-.2.2-.4.4-.2.7.3.5.9 1.3 1.7 2 .9.8 1.7 1.1 2.1 1.3.2.1.4.1.6-.1.2-.2.6-.7.8-1 .2-.3.4-.2.6-.1l1.6.8c.2.1.3.2.4.3.1.1.1.8-.1 1.4z"
+        ></path>
+      </svg>
+      Enviar por WhatsApp
+    </button>
+    <p class="mt-2 text-center font-sans text-xs text-warmgray-700 dark:text-warmgray-100">Se abre en una pestaña nueva.</p>
+  </form>
+</dialog>
+
+<style>
+  /* Entrada suave; sin animación si el sistema pide reducir movimiento. */
+  .booking-modal[open] {
+    animation: booking-in 220ms ease-out;
+  }
+
+  @keyframes booking-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .booking-modal[open] {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { buildWhatsAppUrl } from "../data/contact";
+  import { buildBookingMessage, isValidBookingDate, todayIso } from "../lib/booking";
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-booking-modal]");
+  const form = dialog?.querySelector<HTMLFormElement>("[data-booking-form]");
+  const dateInput = dialog?.querySelector<HTMLInputElement>("#booking-date");
+  const messageInput = dialog?.querySelector<HTMLTextAreaElement>("#booking-message");
+  const submitBtn = dialog?.querySelector<HTMLButtonElement>("[data-booking-submit]");
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-booking-close]");
+  const planWrap = dialog?.querySelector<HTMLElement>("[data-booking-plan-wrap]");
+  const planName = dialog?.querySelector<HTMLElement>("[data-booking-plan-name]");
+
+  const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+
+  let opener: HTMLElement | null = null;
+  let currentPlan = "";
+
+  function updateSubmitState() {
+    if (!submitBtn || !dateInput) return;
+    submitBtn.disabled = !isValidBookingDate(dateInput.value, dateInput.min);
+  }
+
+  function openBooking(trigger: HTMLElement) {
+    if (!dialog || !dateInput || dialog.open) return;
+    opener = trigger;
+    currentPlan = trigger.dataset.bookingPlan?.trim() ?? "";
+
+    if (planWrap && planName) {
+      planName.textContent = currentPlan;
+      planWrap.hidden = currentPlan === "";
+    }
+
+    // El mínimo se recalcula en cada apertura (la página puede quedar abierta de un día para otro).
+    dateInput.min = todayIso();
+    if (dateInput.value && dateInput.value < dateInput.min) dateInput.value = "";
+    updateSubmitState();
+
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    dateInput.focus();
+    document.dispatchEvent(new CustomEvent("booking:open"));
+  }
+
+  // Delegación: funciona con cualquier trigger presente en la página, sin registrarlos uno por uno.
+  document.addEventListener("click", (event) => {
+    const trigger = (event.target as Element | null)?.closest<HTMLElement>("[data-booking-trigger]");
+    if (!trigger) return;
+    event.preventDefault();
+    openBooking(trigger);
+  });
+
+  // Todas las formas de cerrar (Esc, X, click afuera, envío) terminan en el evento "close".
+  dialog?.addEventListener("close", () => {
+    document.body.style.overflow = "";
+    opener?.focus();
+    opener = null;
+    document.dispatchEvent(new CustomEvent("booking:close"));
+  });
+
+  closeBtn?.addEventListener("click", () => dialog?.close());
+
+  // Click afuera = click sobre el propio <dialog> (su backdrop), no sobre el formulario que lo
+  // llena. Se exige que también el pointerdown haya sido afuera, para no cerrar si la clienta
+  // selecciona texto adentro y suelta el mouse fuera del modal.
+  let pointerDownOutside = false;
+  dialog?.addEventListener("pointerdown", (event) => {
+    pointerDownOutside = event.target === dialog;
+  });
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog && pointerDownOutside) dialog.close();
+    pointerDownOutside = false;
+  });
+
+  // Foco atrapado: Tab en el último elemento vuelve al primero, Shift+Tab en el primero va al último.
+  dialog?.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    const focusables = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && (active === first || !dialog.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !dialog.contains(active))) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  dateInput?.addEventListener("input", updateSubmitState);
+  dateInput?.addEventListener("change", updateSubmitState);
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!dateInput || !isValidBookingDate(dateInput.value, dateInput.min)) return;
+
+    const text = buildBookingMessage({ date: dateInput.value, plan: currentPlan, message: messageInput?.value });
+    window.open(buildWhatsAppUrl(text), "_blank", "noopener");
+
+    form.reset();
+    updateSubmitState();
+    dialog?.close();
+  });
+</script>

@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import CustomScrollbar from "../components/CustomScrollbar.astro";
+import BookingModal from "../components/BookingModal.astro";
 
 interface Props {
   title?: string;
@@ -42,6 +43,7 @@ const {
   </head>
   <body class="overflow-x-hidden bg-white font-sans text-warmgray-800 antialiased dark:bg-warmgray-900 dark:text-warmgray-100">
     <slot />
+    <BookingModal />
     <CustomScrollbar />
   </body>
 </html>

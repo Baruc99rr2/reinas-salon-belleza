@@ -128,11 +128,12 @@ const { address, phoneDisplay, hours } = contact;
       </a>
     </div>
 
-    {/* CTA principal: scroll suave hasta el Footer (misma técnica que los links del Navbar:
-       ancla + scroll-behavior:smooth / scroll-margin-top globales, sin JS adicional). */}
-    <a
-      href="#contact"
-      class="group mt-6 inline-flex items-center gap-3 rounded-full bg-white/90 pl-6 pr-1.5 py-1.5 font-sans text-sm font-semibold text-rose-600 shadow-lg backdrop-blur-sm transition-colors hover:bg-white sm:mt-8 sm:pl-7 sm:text-base dark:bg-warmgray-800/90 dark:text-rose-muted dark:hover:bg-warmgray-800"
+    {/* CTA principal: abre el modal de reserva por WhatsApp (BookingModal, incluido en Layout). */}
+    <button
+      type="button"
+      data-booking-trigger
+      aria-haspopup="dialog"
+      class="group mt-6 inline-flex cursor-pointer items-center gap-3 rounded-full bg-white/90 pl-6 pr-1.5 py-1.5 font-sans text-sm font-semibold text-rose-600 shadow-lg backdrop-blur-sm transition-colors hover:bg-white sm:mt-8 sm:pl-7 sm:text-base dark:bg-warmgray-800/90 dark:text-rose-muted dark:hover:bg-warmgray-800"
     >
       Reservá tu turno
       <span
@@ -145,7 +146,7 @@ const { address, phoneDisplay, hours } = contact;
           <path d="M8.5 14.5l2 2 4-4" />
         </svg>
       </span>
-    </a>
+    </button>
   </div>
 
   <WaveDivider
