@@ -1,0 +1,100 @@
+<!doctype html>
+<!--
+  Plantilla de la imagen para compartir (Open Graph / Twitter / vista previa de WhatsApp).
+  Para regenerar public/og-image.jpg: abrir este archivo en un navegador con la ventana en
+  1200x630 (o con las herramientas de desarrollo, modo dispositivo 1200x630) y capturar la página.
+  Todo el contenido va dentro del cuadrado central de 630px, porque WhatsApp a veces recorta la
+  vista previa en cuadrado.
+-->
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Imagen para compartir · Reinas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Poppins:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(circle at 50% 44%, rgb(255 255 255 / 0.85) 0, rgb(255 255 255 / 0) 34%),
+          radial-gradient(circle at 12% 18%, #fbd3e0 0, rgb(251 211 224 / 0) 38%),
+          radial-gradient(circle at 88% 85%, #f7b2cb 0, rgb(247 178 203 / 0) 42%),
+          linear-gradient(135deg, #fff5f8 0%, #fde8ef 55%, #fbd3e0 100%);
+        font-family: "Poppins", sans-serif;
+      }
+      /* Marco fino dorado, como un sello: refuerza la marca sin competir con el texto. */
+      .frame {
+        position: absolute;
+        inset: 26px;
+        border: 2px solid rgb(201 169 106 / 0.45);
+        border-radius: 28px;
+      }
+      .content {
+        display: flex;
+        width: 560px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .crown {
+        width: 210px;
+        height: auto;
+        filter: drop-shadow(0 6px 10px rgb(178 54 98 / 0.18));
+      }
+      .brand {
+        margin: 4px 0 0;
+        font-family: "Playfair Display", serif;
+        font-size: 150px;
+        font-weight: 500;
+        line-height: 1;
+        color: #4a413d;
+        letter-spacing: 0.01em;
+      }
+      .divider {
+        margin: 22px 0 18px;
+        width: 120px;
+        height: 2px;
+        background: linear-gradient(90deg, rgb(178 54 98 / 0), #b23662, rgb(178 54 98 / 0));
+      }
+      .tagline {
+        margin: 0;
+        font-size: 27px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #b23662;
+      }
+      .place {
+        margin: 14px 0 0;
+        font-size: 21px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: #5c5049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame"></div>
+    <div class="content">
+      <img class="crown" src="../src/assets/logo2.png" alt="" />
+      <p class="brand">Reinas</p>
+      <div class="divider"></div>
+      <p class="tagline">Centro de belleza integral</p>
+      <p class="place">San Salvador de Jujuy</p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "Reinas · Centro de belleza integral",
+  "short_name": "Reinas",
+  "description": "Centro de belleza integral en San Salvador de Jujuy.",
+  "lang": "es-AR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#e8709a",
+  "background_color": "#fff5f8",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

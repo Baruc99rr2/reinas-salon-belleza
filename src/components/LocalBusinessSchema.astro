@@ -1,0 +1,62 @@
+---
+// Datos estructurados (JSON-LD, schema.org BeautySalon) para buscadores. Todo sale de los datos del
+// sitio: contacto y redes de data/contact.ts, servicios de data/skills.ts y URLs de `site`
+// (astro.config.mjs).
+//
+// Sin horarios (se atiende con turno previo) y sin nada de los talleres de Volver al Origen: su
+// dirección se pasa por WhatsApp y no debe publicarse en ningún dato estructurado.
+import { getImage } from "astro:assets";
+import logoSrc from "../assets/logo.png";
+import { contact } from "../data/contact";
+import { skillCategories } from "../data/skills";
+
+interface Props {
+  description: string;
+}
+
+const { description } = Astro.props;
+
+const home = new URL("/", Astro.site).href;
+const logo = await getImage({ src: logoSrc, width: 512, format: "png" });
+
+const data = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "@id": `${home}#salon`,
+  name: contact.brand,
+  alternateName: `${contact.brand} · ${contact.tagline}`,
+  description,
+  url: home,
+  image: new URL("/og-image.jpg", Astro.site).href,
+  logo: new URL(logo.src, Astro.site).href,
+  telephone: `+${contact.whatsapp}`,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: contact.postalAddress.street,
+    addressLocality: contact.postalAddress.locality,
+    addressRegion: contact.postalAddress.region,
+    addressCountry: contact.postalAddress.country,
+  },
+  areaServed: { "@type": "City", name: contact.postalAddress.locality },
+  founder: { "@type": "Person", name: contact.owner },
+  sameAs: contact.socials.map((social) => social.url).filter((url) => url.trim() !== ""),
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Servicios",
+    itemListElement: skillCategories.map((category) => ({
+      "@type": "OfferCatalog",
+      name: category.title,
+      description: category.description,
+      itemListElement: category.services.map((service) => ({
+        "@type": "Offer",
+        itemOffered: { "@type": "Service", name: service, serviceType: category.title },
+      })),
+    })),
+  },
+};
+
+// "<" escapado: así ningún texto puede cerrar el <script> antes de tiempo.
+const json = JSON.stringify(data).replace(/</g, "\\u003c");
+---
+
+<script type="application/ld+json" set:html={json} />

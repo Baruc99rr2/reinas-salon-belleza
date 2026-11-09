@@ -7,7 +7,18 @@ export interface SocialLink {
   url: string;
 }
 
-const address = "Otero 381, Barrio Centro, San Salvador de Jujuy";
+/** Dirección por partes (la usan los datos estructurados para buscadores). */
+const postalAddress = {
+  street: "Otero 381",
+  neighborhood: "Barrio Centro",
+  locality: "San Salvador de Jujuy",
+  region: "Jujuy",
+  /** Código de país ISO 3166-1. */
+  country: "AR",
+};
+
+/** Dirección tal como se muestra en el sitio. */
+const address = `${postalAddress.street}, ${postalAddress.neighborhood}, ${postalAddress.locality}`;
 
 // Una red con url vacía no se muestra en el sitio.
 const socials: SocialLink[] = [
@@ -26,6 +37,7 @@ export const contact = {
   whatsapp: "5493877407488",
 
   address,
+  postalAddress,
   /** Mapa embebido de Google Maps (iframe del Footer), generado a partir de la dirección. */
   mapEmbedUrl: `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`,
 

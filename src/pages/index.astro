@@ -8,9 +8,15 @@ import ServicePicker from "../components/ServicePicker.astro";
 import VolverAlOrigen from "../components/VolverAlOrigen.astro";
 import ImageLightbox from "../components/ImageLightbox.astro";
 import Footer from "../components/Footer.astro";
+import LocalBusinessSchema from "../components/LocalBusinessSchema.astro";
+
+const title = "Reinas · Estética y depilación definitiva en San Salvador de Jujuy";
+const description =
+  "Faciales, corporales, depilación definitiva, masajes, pestañas y cejas en San Salvador de Jujuy. Talleres de Constelaciones Familiares. Reservá por WhatsApp.";
 ---
 
-<Layout>
+<Layout title={title} description={description}>
+  <LocalBusinessSchema slot="head" description={description} />
   <Navbar />
 
   <main>

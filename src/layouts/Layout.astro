@@ -7,16 +7,26 @@ import { contact } from "../data/contact";
 interface Props {
   title?: string;
   description?: string;
+  /** true para páginas que no deben indexarse (ej. la 404). */
+  noindex?: boolean;
 }
 
 const {
-  title = `${contact.brand} | ${contact.tagline}`,
+  title = `${contact.brand} · ${contact.tagline}`,
   description = `${contact.brand}, centro de belleza integral en San Salvador de Jujuy: faciales, corporales, depilación definitiva, masajes, pestañas y cejas.`,
+  noindex = false,
 } = Astro.props;
+
+// Todas las URL absolutas salen de `site` (astro.config.mjs). Canonical con barra final, igual que
+// el sitemap (las páginas se generan como carpetas: /sobre-mi/index.html).
+const path = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(path, Astro.site).href;
+const ogImage = new URL("/og-image.jpg", Astro.site).href;
+const ogImageAlt = `Corona de ${contact.brand} y el texto "${contact.brand} · ${contact.tagline}"`;
 ---
 
 <!doctype html>
-<html lang="es" class="overflow-x-hidden">
+<html lang="es-AR" class="overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
@@ -34,11 +44,40 @@ const {
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    {/* Íconos (generados con scripts/generate-icons.py a partir de la corona) */}
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#e8709a" />
+
+    {/* Vista previa al compartir (WhatsApp, Facebook, X). Imagen: public/og-image.jpg (plantilla en scripts/og-image.html). */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={contact.brand} />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+
+    {/* Datos propios de cada página (ej. JSON-LD en la home). */}
+    <slot name="head" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
