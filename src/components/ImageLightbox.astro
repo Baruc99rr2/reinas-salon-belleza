@@ -1,0 +1,84 @@
+---
+// Visor de imagen ampliada, reutilizable. Se incluye una vez por página y abre cualquier botón con
+// data-lightbox-thumb, que indica la versión grande en data-full-src / data-full-width /
+// data-full-height. El texto alternativo se toma de la <img> de la miniatura.
+//
+//   <button type="button" data-lightbox-thumb data-full-src={full.src}
+//     data-full-width={full.attributes.width} data-full-height={full.attributes.height}>
+//     <Image ... alt="Descripción" />
+//   </button>
+//
+// Una imagen, una X y nada más: se cierra con la X, con Esc o tocando afuera. El foco va a la X,
+// queda atrapado adentro y vuelve a la miniatura al cerrar.
+---
+
+<dialog
+  data-image-lightbox
+  aria-label="Imagen ampliada"
+  class="m-auto max-h-none max-w-none overflow-visible bg-transparent p-0 backdrop:bg-black/85"
+>
+  <button
+    type="button"
+    data-lightbox-close
+    aria-label="Cerrar"
+    class="fixed top-3 right-3 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25 focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:outline-none"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+  </button>
+  <img data-lightbox-image alt="" class="block h-auto max-h-[calc(100dvh-6rem)] w-auto max-w-[calc(100vw-2rem)] rounded-lg object-contain shadow-2xl" />
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>("[data-image-lightbox]");
+  const image = dialog?.querySelector<HTMLImageElement>("[data-lightbox-image]");
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
+
+  let opener: HTMLElement | null = null;
+
+  function openLightbox(thumb: HTMLElement) {
+    if (!dialog || !image || dialog.open) return;
+    opener = thumb;
+    image.src = thumb.dataset.fullSrc ?? "";
+    image.width = Number(thumb.dataset.fullWidth) || 0;
+    image.height = Number(thumb.dataset.fullHeight) || 0;
+    image.alt = thumb.querySelector("img")?.alt ?? "";
+
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    closeBtn?.focus();
+  }
+
+  // Delegación: sirve para miniaturas que estén en cualquier parte de la página.
+  document.addEventListener("click", (event) => {
+    const thumb = (event.target as Element | null)?.closest<HTMLElement>("[data-lightbox-thumb]");
+    if (thumb) openLightbox(thumb);
+  });
+
+  // Esc (nativo del <dialog>), X y click afuera terminan todos acá: el foco vuelve a la miniatura.
+  dialog?.addEventListener("close", () => {
+    document.body.style.overflow = "";
+    opener?.focus();
+    opener = null;
+  });
+
+  closeBtn?.addEventListener("click", () => dialog?.close());
+
+  // Click afuera = sobre el backdrop (el propio <dialog>), no sobre la imagen.
+  let pointerDownOutside = false;
+  dialog?.addEventListener("pointerdown", (event) => {
+    pointerDownOutside = event.target === dialog;
+  });
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog && pointerDownOutside) dialog.close();
+    pointerDownOutside = false;
+  });
+
+  // Foco atrapado: el único elemento enfocable adentro es la X.
+  dialog?.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    event.preventDefault();
+    closeBtn?.focus();
+  });
+</script>

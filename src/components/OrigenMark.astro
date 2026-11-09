@@ -25,7 +25,7 @@ const { as: NameTag = "h2", treeWidth = 220, showMotto = true } = Astro.props;
     class="origen-medallion flex items-center justify-center rounded-full"
     style={`--tree-w: ${treeWidth}px`}
   >
-    <Image src={tree} width={treeWidth} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-auto w-[var(--tree-w)] max-w-full" />
+    <Image src={tree} width={treeWidth} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-auto w-[76%]" />
   </div>
 
   <NameTag class="mt-1 font-origen text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.1] text-origen-wine dark:text-origen-blush">
@@ -42,11 +42,12 @@ const { as: NameTag = "h2", treeWidth = 220, showMotto = true } = Astro.props;
 </div>
 
 <style>
-  /* Claro: el medallón es del mismo crema que el árbol y la sección, así que no se ve. */
+  /* El árbol ocupa el 76% del medallón, así entra entero en el círculo a cualquier ancho.
+     Claro: el crema se desvanece hacia afuera (sin borde), fundido con la sección. */
   .origen-medallion {
-    width: min(100%, calc(var(--tree-w) + 3rem));
+    width: min(100%, calc(var(--tree-w) / 0.76));
     aspect-ratio: 1;
-    background: var(--color-origen-cream);
+    background: radial-gradient(circle, var(--color-origen-cream) 58%, transparent 71%);
   }
 
   /* Oscuro: medallón crema con halo dorado tenue, como una luna cálida. */
