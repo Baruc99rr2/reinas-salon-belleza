@@ -8,7 +8,7 @@ import type { ImageMetadata } from "astro";
 import cardPestanas from "../assets/card/card-2.avif";
 import cardFaciales from "../assets/card/card-3.png";
 import cardMasajes from "../assets/card/card-4.jpg";
-import cabina from "../assets/about/imagen1.jpg";
+import { salonPhotos } from "../data/salon";
 import WaveDivider from "./WaveDivider.astro";
 import { cssBackground } from "../lib/images";
 
@@ -21,7 +21,7 @@ const bgCard = await getImage({ src: bgCardImg, format: "webp", width: 1200, qua
 // Depilación definitiva usa una foto real de la cabina del salón.
 const imageById: Record<string, ImageMetadata> = {
   "faciales-corporales": cardFaciales,
-  depilacion: cabina,
+  depilacion: salonPhotos.cabina.image,
   masajes: cardMasajes,
   "pestanas-cejas": cardPestanas,
 };

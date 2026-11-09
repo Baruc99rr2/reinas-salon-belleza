@@ -10,17 +10,14 @@ import { getImage } from "astro:assets";
 import { skillCategories } from "../data/skills";
 import WaveDivider from "./WaveDivider.astro";
 import ServiceFlower from "./ServiceFlower.astro";
-import fotoEquipo from "../assets/about/photo_2026-11-02_05-19-11.jpg";
-import fotoCabina from "../assets/about/imagen1.jpg";
-import fotoCabinaLuzTenue from "../assets/about/photo_2026-10-30_19-03-58.jpg";
-import fotoTocador from "../assets/about/photo_2026-11-02_05-19-10 (2).jpg";
+import { salonPhotos } from "../data/salon";
 
 // No hay fotos de masajes ni de depilación: esas dos usan fotos generales de la cabina.
 const backgrounds: Record<string, ImageMetadata> = {
-  "faciales-corporales": fotoEquipo,
-  depilacion: fotoCabina,
-  masajes: fotoCabinaLuzTenue,
-  "pestanas-cejas": fotoTocador,
+  "faciales-corporales": salonPhotos.equipo.image,
+  depilacion: salonPhotos.cabina.image,
+  masajes: salonPhotos.cabinaLed.image,
+  "pestanas-cejas": salonPhotos.tocador.image,
 };
 
 const flowerColors: Record<string, string> = {
@@ -34,7 +31,7 @@ const flowerColors: Record<string, string> = {
 // El script los lee de data-bg-urls para el cross-fade.
 const bgUrls = await Promise.all(
   skillCategories.map(async (category) => {
-    const src = backgrounds[category.id] ?? fotoCabina;
+    const src = backgrounds[category.id] ?? salonPhotos.cabina.image;
     return (await getImage({ src, format: "webp", width: 1920, quality: 72 })).src;
   }),
 );

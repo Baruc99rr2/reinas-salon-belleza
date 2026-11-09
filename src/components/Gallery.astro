@@ -4,27 +4,26 @@ import bgGalleryImg from "../assets/carrousel/bg-carrousel.png";
 import logoCrest from "../assets/logo2.png";
 import galleryVideo from "../assets/carrousel/carrousel-9.mp4";
 import galleryPosterImg from "../assets/posters/carrousel-9-poster.jpg";
-import img1 from "../assets/carrousel/carrousel-1.jpg";
-import img2 from "../assets/carrousel/carrousel-2.jpg";
 import img3 from "../assets/carrousel/carrousel-3.png";
 import img4 from "../assets/carrousel/carrousel-4.webp";
 import img5 from "../assets/carrousel/carrousel-5.jpg";
 import img6 from "../assets/carrousel/carrousel-6.jpg";
-import img7 from "../assets/carrousel/carrousel-7.png";
-import img8 from "../assets/carrousel/carrousel-8.jpg";
+import { salonPhotos } from "../data/salon";
 import WaveDivider from "./WaveDivider.astro";
 import { contact } from "../data/contact";
 import { cssBackground } from "../lib/images";
 
+// Solo servicios que el salón ofrece. Las fotos de peinado, maquillaje y pedicura se reemplazaron
+// por fotos reales del salón (data/salon.ts), elegidas para que no se repitan entre sí.
 const photos = {
-  1: { src: img1, alt: "Peluquera armando un recogido a una clienta frente al espejo" },
-  2: { src: img2, alt: "Cabello largo castaño con ondas, visto de espaldas" },
+  1: { src: salonPhotos.cabina.image, alt: salonPhotos.cabina.alt },
+  2: { src: salonPhotos.equipo.image, alt: salonPhotos.equipo.alt },
   3: { src: img3, alt: "Masaje con piedras calientes sobre la espalda" },
   4: { src: img4, alt: "Esteticista haciendo un tratamiento de aparatología en camilla" },
   5: { src: img5, alt: "Aplicación de mascarilla facial con pincel" },
-  6: { src: img6, alt: "Interior del salón con sillones y estantería iluminada" },
-  7: { src: img7, alt: "Pedicura spa con pétalos y velas" },
-  8: { src: img8, alt: "Maquillaje profesional: aplicación de labial a una clienta" },
+  6: { src: img6, alt: "Interior de un salón con sillones y estantería iluminada" },
+  7: { src: salonPhotos.noche.image, alt: salonPhotos.noche.alt },
+  8: { src: salonPhotos.rincon.image, alt: salonPhotos.rincon.alt },
 };
 
 // El grid se lee como 3 columnas de 3 celdas cada una (ver <style> más abajo). La celda

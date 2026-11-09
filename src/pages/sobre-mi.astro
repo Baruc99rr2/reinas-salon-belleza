@@ -9,29 +9,14 @@ import ImageLightbox from "../components/ImageLightbox.astro";
 import OrigenMark from "../components/OrigenMark.astro";
 import { contact } from "../data/contact";
 import crown from "../assets/logo2.png";
+import { salonPhotos as salon } from "../data/salon";
 
-// Fotos del salón (src/assets/about/). Se eligieron 8 que no se repiten entre sí; las demás de la
-// carpeta son tomas casi iguales a estas o, en un caso, la tarjeta de presentación.
-import salonCabina from "../assets/about/imagen1.jpg";
-import salonLed from "../assets/about/photo_2026-10-30_19-03-58.jpg";
-import salonEquipo from "../assets/about/photo_2026-11-02_05-19-11.jpg";
-import salonLavado from "../assets/about/photo_2026-11-02_05-19-07 (2).jpg";
-import salonTocador from "../assets/about/photo_2026-11-02_05-19-10 (2).jpg";
-import salonVista from "../assets/about/photo_2026-11-02_05-19-08 (2).jpg";
-import salonNoche from "../assets/about/photo_2026-11-02_05-19-09.jpg";
-import salonRincon from "../assets/about/photo_2026-11-02_05-19-11 (2).jpg";
-
+// Fotos del salón: las 8 de data/salon.ts (con su texto alternativo), en este orden.
 const salonPhotos = await Promise.all(
-  [
-    { image: salonCabina, alt: "Cabina de tratamientos con camilla, equipo de aparatología y carrito de productos" },
-    { image: salonLed, alt: "Cabina de tratamientos con una máscara LED facial encendida sobre la camilla" },
-    { image: salonEquipo, alt: "Equipo de aparatología corporal del salón" },
-    { image: salonVista, alt: "Vista del salón: estantería con productos, espejos redondos iluminados y sillones" },
-    { image: salonTocador, alt: "Tocador con dos espejos redondos iluminados y un arreglo de flores" },
-    { image: salonLavado, alt: "Sector de lavado con sillones negros y estantería de productos" },
-    { image: salonNoche, alt: "El salón con luces de ambiente azules" },
-    { image: salonRincon, alt: "Rincón del salón con espejos iluminados, un sillón rosa y la puerta de entrada" },
-  ].map(async (photo) => ({ ...photo, full: await getImage({ src: photo.image, format: "webp", width: 1280 }) })),
+  [salon.cabina, salon.cabinaLed, salon.equipo, salon.vista, salon.tocador, salon.lavado, salon.noche, salon.rincon].map(async (photo) => ({
+    ...photo,
+    full: await getImage({ src: photo.image, format: "webp", width: 1280 }),
+  })),
 );
 
 // Todos los títulos de src/assets/studies/titulo-N.jpg, ordenados por N (las claves del glob vienen
