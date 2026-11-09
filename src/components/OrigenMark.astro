@@ -1,0 +1,59 @@
+---
+// Marca de "Volver al Origen": el árbol del logo (recortado de src/assets/origen/, sin texto ni
+// teléfono) + el nombre como texto real en script + el lema.
+//
+// El árbol conserva el fondo crema del logo con los bordes desvanecidos: en modo claro se funde
+// con el crema de la sección; en oscuro queda dentro de un medallón crema con un halo dorado, para
+// que la acuarela y el verde se sigan viendo cálidos sobre el fondo de noche.
+import "@fontsource/alex-brush/latin-400.css";
+import { Image } from "astro:assets";
+import tree from "../assets/origen/arbol-volver-al-origen.png";
+
+interface Props {
+  /** Etiqueta del nombre (h2 en la sección de la home, p donde no corresponde un título). */
+  as?: "h2" | "h3" | "p";
+  /** Ancho del árbol en px (se genera también la versión 2x). */
+  treeWidth?: number;
+  showMotto?: boolean;
+}
+
+const { as: NameTag = "h2", treeWidth = 220, showMotto = true } = Astro.props;
+---
+
+<div class="flex flex-col items-center text-center">
+  <div
+    class="origen-medallion flex items-center justify-center rounded-full"
+    style={`--tree-w: ${treeWidth}px`}
+  >
+    <Image src={tree} width={treeWidth} densities={[1, 2]} alt="" aria-hidden="true" loading="lazy" class="h-auto w-[var(--tree-w)] max-w-full" />
+  </div>
+
+  <NameTag class="mt-1 font-origen text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.1] text-origen-wine dark:text-origen-blush">
+    Volver al Origen
+  </NameTag>
+
+  {
+    showMotto && (
+      <p class="mt-2 font-sans text-[0.7rem] font-medium tracking-[0.22em] text-origen-ink-soft uppercase sm:text-xs dark:text-origen-moon-soft">
+        Sanar el presente honrando el origen
+      </p>
+    )
+  }
+</div>
+
+<style>
+  /* Claro: el medallón es del mismo crema que el árbol y la sección, así que no se ve. */
+  .origen-medallion {
+    width: min(100%, calc(var(--tree-w) + 3rem));
+    aspect-ratio: 1;
+    background: var(--color-origen-cream);
+  }
+
+  /* Oscuro: medallón crema con halo dorado tenue, como una luna cálida. */
+  :global(.dark) .origen-medallion {
+    background: radial-gradient(circle, var(--color-origen-cream) 62%, #f3e6da 100%);
+    box-shadow:
+      0 0 0 1px rgb(201 169 106 / 0.35),
+      0 0 40px 6px rgb(201 169 106 / 0.18);
+  }
+</style>

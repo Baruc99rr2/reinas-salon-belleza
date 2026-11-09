@@ -32,6 +32,28 @@
   /* Tipografías */
   --font-display: "Playfair Display", serif;
   --font-sans: "Poppins", sans-serif;
+  /* Script de "Volver al Origen". El @font-face se importa solo en OrigenMark.astro, así que la
+     fuente se descarga únicamente en las páginas que la usan. */
+  --font-origen: "Alex Brush", cursive;
+
+  /* Volver al Origen — sacados del logo (crema de fondo, hoja, tronco, acuarela, letras).
+     Claro: crema cálida. Oscuro: noche verde-tierra (no gris) con dorado, salvia y rubor apagados. */
+  --color-origen-cream: #fff6f1;
+  --color-origen-sand: #f7ebe1;
+  --color-origen-leaf: #839647;
+  --color-origen-leaf-deep: #4d6a33;
+  --color-origen-trunk: #85613d;
+  --color-origen-watercolor: #f6b9ad;
+  --color-origen-wine: #a3445a;
+  --color-origen-ink: #4a3526;
+  --color-origen-ink-soft: #6b5546;
+  --color-origen-night: #171b14;
+  --color-origen-night-earth: #211a13;
+  --color-origen-moon: #efe4d2;
+  --color-origen-moon-soft: #cbbfae;
+  --color-origen-gold: #c9a96a;
+  --color-origen-sage: #a5bb8c;
+  --color-origen-blush: #e2aab0;
 }
 
 /* Scroll suave al navegar por anclas (links del Navbar). scroll-margin-top evita que el
