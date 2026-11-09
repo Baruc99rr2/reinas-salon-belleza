@@ -9,9 +9,9 @@ export interface SocialLink {
 
 const address = "Otero 381, Barrio Centro, San Salvador de Jujuy";
 
-// Instagram queda vacío (oculto en el sitio) hasta tener la URL confirmada.
+// Una red con url vacía no se muestra en el sitio.
 const socials: SocialLink[] = [
-  { name: "Instagram", url: "" },
+  { name: "Instagram", url: "https://www.instagram.com/reinas.salon/" },
   { name: "Facebook", url: "https://www.facebook.com/profile.php?id=61595963794706" },
 ];
 
