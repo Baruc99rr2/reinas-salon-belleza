@@ -1,11 +1,23 @@
-Carpeta para las imágenes del proyecto (logo, fotos, íconos, etc.).
+Imágenes y videos originales del sitio. Astro los optimiza en el build: lo que se publica son
+versiones WebP/AVIF redimensionadas, nunca estos archivos tal cual.
 
-Cuando el logo esté listo, agregarlo acá (por ejemplo `logo.png`) e importarlo en `Navbar.astro`:
+- `logo.png`, `logo2.png` — logo completo y corona (masters en alta resolución).
+- `bg-*.png` — fondos de secciones. `bg-hero.mp4` — video del Hero.
+- `carrousel/` — fotos y video de la Galería. `card/` — fotos de las categorías de servicios.
+- `plan/plan-N.*` — fondo de Precios mientras el plan con `id` N está activo.
+- `studies/titulo-N.jpg` — títulos y certificaciones de "Sobre mí".
+- `posters/` — primer frame de cada video, usado como portada.
+
+La extensión tiene que coincidir con el formato real del archivo (un WebP con extensión `.jpg`
+confunde a algunas herramientas).
+
+Para mostrar una imagen, usar los componentes de `astro:assets` en vez de `imagen.src`:
 
 ```astro
 ---
+import { Image } from "astro:assets";
 import logo from "../assets/logo.png";
 ---
 
-<img src={logo.src} alt="Reinas" class="h-12 w-12 rounded-full object-cover" />
+<Image src={logo} width={64} densities={[1, 2]} alt="Reinas" />
 ```

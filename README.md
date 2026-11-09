@@ -1,43 +1,88 @@
-# Astro Starter Kit: Minimal
+# Reinas — Centro de belleza integral
+
+Landing del salón **Reinas** (Otero 381, San Salvador de Jujuy). Sitio estático hecho con
+[Astro](https://docs.astro.build) 7, Tailwind CSS v4 y TypeScript. Las reservas y consultas se hacen
+por WhatsApp: no hay backend.
+
+- **`/`** — Hero con video, Galería, Servicios (MySkills), Precios y Footer con formulario de contacto.
+- **`/sobre-mi`** — Biografía y grilla de títulos y certificaciones con visor ampliado.
+
+Modo claro/oscuro, pensado para funcionar desde 250px de ancho.
+
+## Cómo correrlo
+
+Requiere Node 22.12 o superior.
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev        # servidor de desarrollo en http://localhost:4321
+npm run build      # genera el sitio estático en dist/
+npm run preview    # sirve dist/ para revisarlo antes de publicar
+npx astro check    # chequeo de tipos de .astro y .ts
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Para publicar, alcanza con subir el contenido de `dist/` a cualquier hosting estático.
 
-## 🚀 Project Structure
+## Dónde se editan los datos
 
-Inside of your Astro project, you'll see the following folders and files:
+| Qué | Archivo |
+|---|---|
+| Marca, responsable, teléfono, WhatsApp, dirección, mapa, horario y redes sociales | `src/data/contact.ts` |
+| Planes y precios (carrusel de Precios) | `src/data/pricing.ts` |
+| Categorías de servicios (tarjetas y modal de MySkills) | `src/data/skills.ts` |
+
+Detalles:
+
+- **`contact.ts`** es la única fuente de los datos de contacto: Hero, Footer, títulos de página y
+  mensajes de WhatsApp leen de ahí. Una red social con `url: ""` no se muestra. `whatsapp` va solo
+  con dígitos en formato internacional (`549...`). `buildWhatsAppUrl(texto)` arma el link `wa.me`.
+- **`pricing.ts`**: cada plan tiene `category`, `title`, `price` (número o "A consultar"), `period`,
+  `description` (lista), `featured` (etiqueta "Más elegido") y `flowerColor` (color de la flor
+  decorativa). El fondo de la sección mientras el plan está activo sale solo de
+  `src/assets/plan/plan-N.<png|jpg|webp|avif>`, con N = `id` del plan.
+- **`skills.ts`**: las fotos de cada categoría están en `src/assets/card/` y se asignan en
+  `src/components/MySkills.astro`, en el mismo orden que el array.
+- **Galería**: las 8 fotos, su orden y sus textos alternativos están al principio de
+  `src/components/Gallery.astro`.
+- **Títulos de "Sobre mí"**: cualquier `src/assets/studies/titulo-N.jpg` aparece solo en la grilla,
+  ordenado por N.
+
+## Reservas por WhatsApp
+
+- `src/components/BookingModal.astro`: modal de reserva (fecha + mensaje opcional). Se abre con
+  cualquier elemento que tenga `data-booking-trigger`; con `data-booking-plan="Nombre"` muestra y
+  envía el plan elegido. Lo usan el botón del Hero y los "Consultar" de Precios.
+- El formulario del Footer valida nombre y mensaje y abre WhatsApp con el texto armado.
+- Los textos de los mensajes se arman en `src/lib/booking.ts`.
+
+## Imágenes y videos
+
+Todas las imágenes pasan por `astro:assets` (`<Image>`, `<Picture>` o `getImage()`): en el sitio
+publicado solo hay versiones WebP/AVIF al tamaño necesario, nunca los originales.
+
+- Para fondos por CSS se usa `cssBackground()` de `src/lib/images.ts`.
+- **No leer propiedades de una imagen importada** (`imagen.src`, `imagen.width`...): Astro lo toma
+  como que se usa el original y lo copia completo a `dist/`.
+- Los videos tienen portada (`poster`) sacada de su primer frame, en `src/assets/posters/`. Si se
+  cambia un video, regenerarla, por ejemplo con
+  `ffmpeg -i video.mp4 -frames:v 1 -q:v 2 video-poster.jpg`.
+
+## Estructura
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+├── assets/        imágenes y videos (originales; se optimizan en el build)
+├── components/    secciones de la home, Navbar, Footer, BookingModal, etc.
+├── data/          contact.ts, pricing.ts, skills.ts
+├── layouts/       Layout.astro (head, tema claro/oscuro, modal de reserva)
+├── lib/           booking.ts (mensajes de WhatsApp), images.ts (fondos optimizados)
+├── pages/         index.astro (/) y sobre-mi.astro (/sobre-mi)
+└── styles/        global.css (paleta, tipografías y ajustes globales)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Pendientes de contenido
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Confirmar el horario real (`contact.ts`).
+- Cargar las URLs de Instagram, Facebook y TikTok (`contact.ts`).
+- Reemplazar los precios de ejemplo (`pricing.ts`).
+- Reemplazar la biografía de `/sobre-mi`.
