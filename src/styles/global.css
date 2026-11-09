@@ -51,15 +51,19 @@ footer[id] {
   }
 }
 
-/* Oculta el scrollbar nativo del navegador en toda la página — lo reemplaza CustomScrollbar.astro
-   (barra curva rosa neón). Esto es adicional al overflow-x-hidden que ya tiene <html>/<body>
-   (Layout.astro) por el bug de scroll horizontal ya resuelto — no lo toca ni lo reemplaza. */
-html {
-  scrollbar-width: none;
-}
+/* Oculta el scrollbar nativo del navegador — lo reemplaza CustomScrollbar.astro (barra curva rosa
+   neón). Solo con mouse o en pantallas anchas: en pantallas táctiles angostas la barra
+   personalizada tapaba el borde del texto y captaba toques, así que ahí se oculta ella y vuelve
+   la nativa del sistema (que en celulares es superpuesta y se esconde sola). Misma condición que
+   en CustomScrollbar.astro. Esto es aparte del overflow-x-hidden de <html>/<body> (Layout.astro). */
+@media (pointer: fine), (min-width: 768px) {
+  html {
+    scrollbar-width: none;
+  }
 
-html::-webkit-scrollbar {
-  display: none;
+  html::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /*

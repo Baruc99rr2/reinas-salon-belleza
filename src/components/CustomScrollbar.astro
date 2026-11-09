@@ -23,6 +23,13 @@
     pointer-events: none;
   }
 
+  /* Pantallas táctiles angostas: sin barra personalizada (ver global.css). */
+  @media (pointer: coarse) and (max-width: 767px) {
+    #custom-scrollbar-svg {
+      display: none;
+    }
+  }
+
   .scrollbar-track {
     stroke: rgba(0, 0, 0, 0.1);
   }
@@ -72,6 +79,9 @@
   let totalLength = 0;
   let isDragging = false;
 
+  // Misma condición que el CSS: en pantallas táctiles angostas la barra no se muestra ni se calcula.
+  const touchNarrow = window.matchMedia("(pointer: coarse) and (max-width: 767px)");
+
   function buildPath(height: number) {
     const trackX = W - EDGE;
     const topY = PAD;
@@ -90,6 +100,7 @@
   }
 
   function setup() {
+    if (touchNarrow.matches) return;
     const width = svg.clientWidth;
     const height = svg.clientHeight;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -103,6 +114,7 @@
   }
 
   function updateThumb() {
+    if (touchNarrow.matches) return;
     const scrollTop = window.scrollY;
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
@@ -169,6 +181,7 @@
 
   window.addEventListener("scroll", updateThumb, { passive: true });
   window.addEventListener("resize", setup);
+  touchNarrow.addEventListener("change", setup);
 
   setup();
 </script>

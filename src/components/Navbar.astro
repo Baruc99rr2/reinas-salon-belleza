@@ -287,7 +287,13 @@ const mobileLinkClass =
 
   function applyTheme(goingDark: boolean) {
     root.classList.toggle("dark", goingDark);
-    localStorage.setItem("theme", goingDark ? "dark" : "light");
+    // Si el almacenamiento está bloqueado (navegación privada, cookies desactivadas) el tema se
+    // aplica igual; solo no se recuerda para la próxima visita.
+    try {
+      localStorage.setItem("theme", goingDark ? "dark" : "light");
+    } catch {
+      /* noop */
+    }
     syncToggleState();
   }
 

@@ -35,16 +35,22 @@ export function isValidBookingDate(value: string, min: string = todayIso()): boo
   return isRealDate && value >= min;
 }
 
-/** "2026-11-18" → "miércoles 18 de noviembre". */
-export function formatDateEs(value: string): string {
+/**
+ * "2026-11-18" → "miércoles 18 de noviembre". Si la fecha es de otro año que `now`, lo agrega:
+ * "2027-01-08" → "viernes 8 de enero de 2027".
+ */
+export function formatDateEs(value: string, now: Date = new Date()): string {
   const [y, m, d] = value.split("-").map(Number);
   const date = new Date(y, m - 1, d);
-  return `${WEEKDAYS[date.getDay()]} ${d} de ${MONTHS[m - 1]}`;
+  const text = `${WEEKDAYS[date.getDay()]} ${d} de ${MONTHS[m - 1]}`;
+  return y === now.getFullYear() ? text : `${text} de ${y}`;
 }
 
 interface BookingMessageInput {
   /** Fecha elegida, "AAAA-MM-DD". */
   date: string;
+  /** Fecha de referencia para decidir si se muestra el año (por defecto, hoy). */
+  now?: Date;
   /** Nombre del plan, si el modal se abrió desde Precios. */
   plan?: string;
   /** Mensaje opcional de la clienta. */
@@ -52,8 +58,8 @@ interface BookingMessageInput {
 }
 
 /** Mensaje del modal de reserva. */
-export function buildBookingMessage({ date, plan, message }: BookingMessageInput): string {
-  let text = `Quiero sacar un turno para esta fecha: ${formatDateEs(date)}`;
+export function buildBookingMessage({ date, plan, message, now }: BookingMessageInput): string {
+  let text = `Quiero sacar un turno para esta fecha: ${formatDateEs(date, now)}`;
   if (plan?.trim()) text += `\nServicio: ${plan.trim()}`;
   if (message?.trim()) text += `\n\n${message.trim()}`;
   return text;
